@@ -1,24 +1,22 @@
-let time = performance.now()
+// let time = performance.now()
 let score = 0;
 let footballX = window.innerWidth / 2; // Initial X position
 let footballY = window.innerHeight / 2; // Start at the bottom of the screen
 let footballX_2 = window.innerWidth / 2; // Initial X position
 let footballY_2 = window.innerHeight / 2; // Start at the bottom of the screen
-let isBonus = 0
 let random = 0
 let random_2 = 0
 let bonusCount = 1
-let dx = 0 // Initial horizontal velocity
-let dy = 0 // Velocity for moving upwards
+let dx = Math.random() * - 3 // Initial horizontal velocity
+let dy = Math.random() * 4 - 3 // Velocity for moving upwards
 let dx_2 = 0 // Initial horizontal velocity
-let dx1_2 = 0
 let dy_2 = 0 // Velocity for moving upwards
-let dy1_2 = 0
 let direction = 0
-let direction_2 = 0
 let moveUpTime = 7; // Duration of moving upwards (1 second)
 let timeCounter = 0
 let timeCounter_2 = 0
+let cooldown = 0
+let cooldown_2 = 0
 let check = false
 let check_2 = false
 let bonusCheck = false
@@ -70,9 +68,9 @@ getStart()
 function getStart() {
   axios.get(`${api}/game/getstart`)
     .then(result => {
+      if (result.data.server_status.server_status != 1)
+        throw new Error('server is offline')
       if (result?.data?.user.length > 0) {
-        if (result.data.user[0].server_status != 1)
-          throw new Error('server is offline')
         window.localStorage.setItem('uid', result.data.user[0].uid)
         window.localStorage.setItem('name', result.data.user[0].name)
         window.localStorage.setItem('image', result.data.user[0].picture)
@@ -95,7 +93,6 @@ function gameOver() {
   hardLevel = defaultHardLevel
   document.getElementById('countdown-number').innerHTML = 3
   document.getElementById('countdown-section').style.display = 'block'
-  $('#exampleModalCenter').modal('show')
   const phone = window.localStorage.getItem('phone')
   document.getElementById('containner').style.display = 'none'
   document.getElementById('result-containner').style.display = 'block'
@@ -105,22 +102,31 @@ function gameOver() {
     document.getElementById('result-form-phone').style.display = 'none'
   }
   check = true
-  axios.post(`${api}/game/save`, { uid: '12345', name: 'pawat', score: score.toString() })
+  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), name: localStorage.getItem('name'), score: score.toString() })
     .then(() => {
       axios.get(`${api}/game/getranking?uid=${window.localStorage.getItem('uid')}`)
         .then(async result => {
           if (result.data.ranking.length > 0) {
             const containner = document.getElementById('sub-leaderboard')
-            await result.data.ranking?.map((data, index) => {
-              if (index == 0) {
+            await result.data.ranking?.map(data => {
+              if (data.rank == 1) {
                 document.getElementById('first_place-name').innerHTML = data.name
                 document.getElementById('first_place-score').innerHTML = data.score
-              } else if (index == 1) {
+                document.getElementById('thankRank').innerHTML = 1
+                document.getElementById('thankName').innerHTML = data.name
+                document.getElementById('thankScore').innerHTML = data.score
+              } else if (data.rank == 2) {
                 document.getElementById('second_place-name').innerHTML = data.name
                 document.getElementById('second_place-score').innerHTML = data.score
-              } else if (index == 2) {
+                document.getElementById('thankRank').innerHTML = 2
+                document.getElementById('thankName').innerHTML = data.name
+                document.getElementById('thankScore').innerHTML = data.score
+              } else if (data.rank == 3) {
                 document.getElementById('third_place-name').innerHTML = data.name
                 document.getElementById('third_place-score').innerHTML = data.score
+                document.getElementById('thankRank').innerHTML = 3
+                document.getElementById('thankName').innerHTML = data.name
+                document.getElementById('thankScore').innerHTML = data.score
               } else {
                 const card = document.createElement("div")
                 card.classList.add("card-leaderboard")
@@ -159,8 +165,7 @@ function gameOver() {
             document.getElementById('fix-leaderboard').style.display = 'none'
           }
         })
-    }).catch((err) => {
-      console.log(err)
+    }).catch(() => {
       alert('การบันทึกไม่สำเร็จ กรุณาลองใหม่ภายหลัง')
     })
 }
@@ -174,29 +179,19 @@ function asyncFunction() {
 }
 
 function getRandomNumber() {
-  var randomNumberX = Math.random() * -3; //0 to -3
-  var randomNumberY = Math.random() * 4 - 3; // 1 to -3
-  var randomNumberX2 = Math.random() * -3; //0 to -3
-  var randomNumberY2 = Math.random() * 4 - 3; // 1 to -3
+  var randomNumberX = Math.random() * -3 //0 to -3
+  var randomNumberY = Math.random() * 4 - 3 // 1 to -3
   random = Math.random()
 
   direction = Math.random() * 3
   dx = randomNumberX
   dy = randomNumberY
-  dx_2 = randomNumberX2
-  dy_2 = randomNumberY2
 }
 
 function getRandomNumber_2() {
-  var randomNumberX = Math.random() * -3; //0 to -3
-  var randomNumberY = Math.random() * 4 - 3; // 1 to -3
-  random = Math.random()
-
-  direction_2 = Math.random() * 3
-  dx_2 = randomNumberX
-  dx1_2 = -randomNumberX
-  dy_2 = randomNumberY
-  dy1_2 = -randomNumberY
+  random_2 = Math.random()
+  dx_2 = -dx
+  dy_2 = -dy
 }
 
 function increaseLevel() {
@@ -213,15 +208,15 @@ function decreaseLevel() {
 function submit(e) {
   // const name = document.getElementById('name')
   const phone = document.getElementById('phone')
-  const btn = document.getElementById('submitBtn')
   const thankyou = document.getElementById('thankyou-containner')
   const result = document.getElementById('result-containner')
   e.preventDefault();
-  axios.post(`${api}/game/save`, { uid: '12345', phone: phone.value })
+  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: phone.value })
     .then(() => {
       result.style.display = 'none'
       thankyou.style.display = 'block'
-      document.getElementById('thank-card').innerHTML = document.getElementById('you').innerHTML
+      window.localStorage.setItem('phone', phone.value)
+      document.getElementById('result-form-phone').style.display = 'block'
     }).catch((err) => {
       console.log(err)
       alert('การบันทึกไม่สำเร็จ กรุณาลองใหม่ภายหลัง')
@@ -230,157 +225,97 @@ function submit(e) {
 
 async function updateFootballPosition() {
   const football = document.getElementById('football')
-  // const football_2 = document.getElementById('football_2')
+  const football_2 = document.getElementById('football_2')
   const bonus = document.getElementById(`bonus${bonusCount}`)
   const bomb = document.getElementById('bomb')
-  timeCounter += 16.7
+  const bomb_2 = document.getElementById('bomb_2')
+  timeCounter += 5 // 16.7
+  timeCounter_2 += 5
   const percen = timeCounter / (moveUpTime / hardLevel)
-  // timeCounter_2 += 16.7
-  // const percen_2 = (timeCounter_2 / (moveUpTime / hardLevel))
-  // if (percen_2 < 100 && !check_2) {
-  //   football_2.style.display = 'block';
-  //   football_2.style.width = 50 + percen + 'px'
-  //   football_2.style.height = 50 + percen + 'px'
-  //   footballX_2 -= dx * (hardLevel)// Update X position
-  //   footballY_2 -= dy * (hardLevel)// Update Y position
-  // } else {
-  //   timeCounter_2 = 0
-  //   football_2.style.display = 'none'
-  //   football_2.style.width = 50 + 'px'
-  //   football_2.style.height = 50 + 'px'
-  //   footballX_2 = window.innerWidth / 2 // Reset X position
-  //   footballY_2 = window.innerHeight / 2 // Reset Y position
-  // }
-  if (percen < 100 && !check) {
+  const percen_2 = timeCounter_2 / (moveUpTime / hardLevel)
+  if (percen_2 < 100 && cooldown_2 == 0) {
+    if (random_2 > 0.8) {
+      bomb_2.style.width = 50 + (percen_2 + 8) + 'px'
+      bomb_2.style.height = 50 + percen_2 + 'px'
+      bomb_2.style.display = 'block';
+    } else {
+      football_2.style.width = 50 + percen_2 + 'px'
+      football_2.style.height = 50 + percen_2 + 'px'
+      football_2.style.display = 'block';
+    }
+    footballX_2 += dx_2 * (hardLevel)// Update X position
+    footballY_2 += dy_2 * (hardLevel)// Update Y position
+  } else {
+    timeCounter_2 = 0
+    football_2.style.display = 'none'
+    bomb_2.style.display = 'none';
+    footballX_2 = window.innerWidth / 2 // Reset X position
+    footballY_2 = window.innerHeight / 2 // Reset Y position
+  }
+  if (percen < 100 && cooldown == 0) {
     if (random > 0.8) {
-      bomb.style.display = 'block';
       bomb.style.width = 50 + (percen + 8) + 'px'
       bomb.style.height = 50 + percen + 'px'
+      bomb.style.display = 'block';
       // bomb.style.rotate = percen * 1.70 + 'deg'
-      footballX += dx * (hardLevel) // Update X position
-      footballY += dy * (hardLevel) // Update Y position
     } else if (random > 0.5) {
-      bonus.style.display = 'block';
       bonus.style.width = 50 + percen + 'px'
       bonus.style.height = 'auto'
+      bonus.style.display = 'block';
       // bonus.style.rotate = percen * 1.70 + 'deg'
-      footballX += dx * (hardLevel) // Update X position
-      footballY += dy * (hardLevel)// Update Y position
     } else {
-      football.style.display = 'block';
       football.style.width = 50 + percen + 'px'
       football.style.height = 50 + percen + 'px'
-      // football.style.rotate = percen * 1.70 + 'deg'
-      footballX += dx * (hardLevel)// Update X position
-      footballY += dy * (hardLevel)// Update Y position
-    }
-  } else {
-    football.style.display = 'none';
-    bonus.style.display = 'none';
-    bomb.style.display = 'none';
-    timeCounter = 0
-    football.style.width = 50 + 'px'
-    football.style.height = 50 + 'px'
-    bonus.style.width = 50 + 'px'
-    bonus.style.height = 50 + 'px'
-    bomb.style.width = 50 + 'px'
-    bomb.style.height = 50 + 'px'
-    footballX = window.innerWidth / 2 // Reset X position
-    footballY = window.innerHeight / 2 // Reset Y position
-    getRandomNumber()
-    if (bonusCheck) {
-      bonusCount < 3 ? bonusCount++ : bonusCount = 1
-      bonusCheck = false
-    }
-    if (isBonus === 4) {
-      isBonus = 0
-      bonusCount <= 3 ? bonusCount++ : bonusCount = 1
-    }
-  }
-
-
-  // football_2.style.top = footballY_2 + 'px';
-  // football_2.style.left = footballX_2 + 'px';
-  football.style.left = footballX + 'px';
-  football.style.top = footballY + 'px';
-  bonus.style.left = footballX + 'px';
-  bonus.style.top = footballY + 'px';
-  bomb.style.left = footballX + 'px';
-  bomb.style.top = footballY + 'px';
-
-  if (!isOver) {
-    requestAnimationFrame(updateFootballPosition); // Update position in the next frame
-    if (percen < 100 && !check) {
-      // requestAnimationFrame(updateFootballPosition); // Update position in the next frame
-    } else {
-      asyncFunction().then(() => {
-        check = false
-        check_2 = false
-        // requestAnimationFrame(updateFootballPosition); // Update position in the next frame
-      })
-    }
-  }
-}
-
-async function updateFootballPosition2() {
-  const football = document.getElementById('football_2')
-  const bonus = document.getElementById(`bonus${bonusCount}_2`)
-  const bomb = document.getElementById('bomb_2')
-  timeCounter_2 += 16.7
-  const percen2 = timeCounter_2 / (moveUpTime / hardLevel)
-  if (percen2 < 100 && !check) {
-    if (random > 0.8) {
-      bomb.style.display = 'block';
-      bomb.style.width = 50 + (percen2 + 8) + 'px'
-      bomb.style.height = 50 + percen2 + 'px'
-      // bomb.style.rotate = percen2 * 1.70 + 'deg'
-      footballX += dx * (hardLevel) // Update X position
-      footballY += dy * (hardLevel) // Update Y position
-    } else if (random > 0.5) {
-      bonus.style.display = 'block';
-      bonus.style.width = 50 + percen2 + 'px'
-      bonus.style.height = 'auto'
-      // bonus.style.rotate = percen2 * 1.70 + 'deg'
-      footballX += dx * (hardLevel) // Update X position
-      footballY += dy * (hardLevel)// Update Y position
-    } else {
       football.style.display = 'block';
-      football.style.width = 50 + percen2 + 'px'
-      football.style.height = 50 + percen2 + 'px'
-      // football.style.rotate = percen2 * 1.70 + 'deg'
-      footballX += dx * (hardLevel)// Update X position
-      footballY += dy * (hardLevel)// Update Y position
+      // football.style.rotate = percen * 1.70 + 'deg'
     }
+    footballX += dx * (hardLevel)// Update X position
+    footballY += dy * (hardLevel)// Update Y position
   } else {
+    timeCounter = 0
     football.style.display = 'none';
-    bonus.style.display = 'none';
-    bomb.style.display = 'none';
-    timeCounter_2 = 0
     football.style.width = 50 + 'px'
     football.style.height = 50 + 'px'
+    bonus.style.display = 'none';
     bonus.style.width = 50 + 'px'
     bonus.style.height = 50 + 'px'
+    bomb.style.display = 'none';
     bomb.style.width = 50 + 'px'
     bomb.style.height = 50 + 'px'
     footballX = window.innerWidth / 2 // Reset X position
     footballY = window.innerHeight / 2 // Reset Y position
-    getRandomNumber_2()
     if (bonusCheck) {
       bonusCount < 3 ? bonusCount++ : bonusCount = 1
       bonusCheck = false
     }
-    if (isBonus === 4) {
-      isBonus = 0
-      bonusCount <= 3 ? bonusCount++ : bonusCount = 1
-    }
   }
 
+
+  football_2.style.top = footballY_2 + 'px';
+  football_2.style.left = footballX_2 + 'px';
+  bomb_2.style.top = footballY_2 + 'px';
+  bomb_2.style.left = footballX_2 + 'px';
   football.style.left = footballX + 'px';
   football.style.top = footballY + 'px';
   bonus.style.left = footballX + 'px';
   bonus.style.top = footballY + 'px';
   bomb.style.left = footballX + 'px';
   bomb.style.top = footballY + 'px';
+  if (!isOver) {
+    if (cooldown > 0 || cooldown_2 > 0) {
+      cooldown > 0 && cooldown--
+      cooldown_2 > 0 && cooldown_2--
+    }
+    if (percen >= 100) {
+      cooldown = 200
+      getRandomNumber()
+    }
+    if (percen_2 >= 100) {
+      cooldown_2 = 200
+      getRandomNumber_2()
+    }
+    requestAnimationFrame(updateFootballPosition); // Update position in the next frame
+  }
 }
 
 document.getElementById('result-form').addEventListener('submit', function (event) {
@@ -391,7 +326,8 @@ document.getElementById('football').addEventListener('mousedown', function () {
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
   document.getElementById('score-sum').textContent = score;
-  check = true
+  getRandomNumber()
+  cooldown = 200
   this.style.top = Math.floor(window.innerWidth / 2) + 'px';
   this.style.left = Math.floor(window.innerWidth / 2) + 'px';
   const gotone = document.getElementById('gotone')
@@ -403,22 +339,23 @@ document.getElementById('football').addEventListener('mousedown', function () {
   }, 200)
 })
 
-// document.getElementById('football_2').addEventListener('mousedown', function () {
-//   score++
-//   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-//   document.getElementById('score-value').textContent = score;
-//   document.getElementById('score-sum').textContent = score;
-//   check_2 = true
-//   this.style.top = Math.floor(window.innerWidth / 2) + 'px';
-//   this.style.left = Math.floor(window.innerWidth / 2) + 'px';
-//   const gotone = document.getElementById('gotone')
-//   const audio = new Audio("gotone.mp3");
-//   audio.play()
-//   gotone.style.display = 'block'
-//   setTimeout(() => {
-//     gotone.style.display = 'none'
-//   }, 200)
-// })
+document.getElementById('football_2').addEventListener('mousedown', function () {
+  score++
+  hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
+  document.getElementById('score-value').textContent = score;
+  document.getElementById('score-sum').textContent = score;
+  getRandomNumber_2()
+  cooldown_2 = 150
+  this.style.top = Math.floor(window.innerWidth / 2) + 'px';
+  this.style.left = Math.floor(window.innerWidth / 2) + 'px';
+  const gotone = document.getElementById('gotone')
+  const audio = new Audio("gotone.mp3");
+  audio.play()
+  gotone.style.display = 'block'
+  setTimeout(() => {
+    gotone.style.display = 'none'
+  }, 200)
+})
 
 function bonusClick(element) {
   score += 3
@@ -426,7 +363,8 @@ function bonusClick(element) {
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
   document.getElementById('score-sum').textContent = score;
-  check = true
+  getRandomNumber()
+  cooldown = 200
   element.style.top = Math.floor(window.innerWidth / 2) + 'px';
   element.style.left = Math.floor(window.innerWidth / 2) + 'px';
   const gotone = document.getElementById('gottwo')
@@ -436,6 +374,13 @@ function bonusClick(element) {
   setTimeout(() => {
     gotone.style.display = 'none'
   }, 200)
+}
+function bombClick(element) {
+  const audio = new Audio("bomb.mp3");
+  audio.play()
+  gameOver()
+  element.style.top = Math.floor(window.innerWidth / 2) + 'px';
+  element.style.left = Math.floor(window.innerWidth / 2) + 'px';
 }
 
 document.getElementById('bonus1').addEventListener('mousedown', function () {
@@ -449,17 +394,16 @@ document.getElementById('bonus3').addEventListener('mousedown', function () {
 })
 
 document.getElementById('bomb').addEventListener('mousedown', function () {
-  const audio = new Audio("bomb.mp3");
-  audio.play()
-  gameOver()
-  this.style.top = Math.floor(window.innerWidth / 2) + 'px';
-  this.style.left = Math.floor(window.innerWidth / 2) + 'px';
+  bombClick(this)
 })
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById('football').style.top = footballY + 'px';
-  document.getElementById('football').style.left = footballX + 'px';
+document.getElementById('bomb_2').addEventListener('mousedown', function () {
+  bombClick(this)
 })
+// document.addEventListener('DOMContentLoaded', function () {
+//   document.getElementById('football').style.top = footballY + 'px';
+//   document.getElementById('football').style.left = footballX + 'px';
+// })
 
 const setTimer = () => {
   console.log('timer start')
@@ -500,26 +444,45 @@ const startGame = () => {
       document.getElementById('countdown-section').style.display = 'none'
       setTimer()
       updateFootballPosition()
-      updateFootballPosition2()
     }
   }, 1000)
 }
 
-document.getElementById('startBtn').addEventListener('click', (event) => {
-  event.target.innerHTML = 2
-  document.getElementById('startBtn').style.pointerEvents = 'none';
-  countdown(event.target)
-})
+document.addEventListener("DOMContentLoaded", function() {
+  var container = document.getElementById("containner");
+  var handImage = document.getElementById("hand");
 
+  container.addEventListener("click", function(event) {
+      // Prevent default click behavior
+      event.preventDefault();
+      
+      // Calculate click position relative to container
+      var rect = container.getBoundingClientRect();
+      var x = event.clientX - rect.left;
+      var y = event.clientY - rect.top;
+
+      // Set hand image position
+      handImage.style.left = x + "px";
+      handImage.style.top = y + "px";
+
+      // Show hand image
+      handImage.classList.remove("hidden");
+
+      // Hide hand image after 1 second
+      setTimeout(function() {
+          handImage.classList.add("hidden");
+      }, 300);
+  });
+})
 //ปิดtab
-window.addEventListener('beforeunload', function (event) {
-  // Cancel the event
-  event.preventDefault()
-  time -= -this.performance.now()
-  // Chrome requires returnValue to be set
-  axios.post(`${api}/game/timerecord`, { time: Math.floor(time / 1000) })
-    .then(() => {
-    }).catch((err) => {
-      console.log(err)
-    })
-});
+// window.addEventListener('beforeunload', function (event) {
+//   // Cancel the event
+//   event.preventDefault()
+//   time -= -this.performance.now()
+//   // Chrome requires returnValue to be set
+//   axios.post(`${api}/game/timerecord`, { time: Math.floor(time / 1000) })
+//     .then(() => {
+//     }).catch((err) => {
+//       console.log(err)
+//     })
+// });

@@ -26,6 +26,14 @@ h1 {
   color: white !important;
 }
 
+#hand {
+  position: absolute;
+  width: 120px;
+  height: auto;
+  transform: translate(-50%, -50%);
+  animation: show-hands 0.1s linear;
+}
+
 #football,
 #football_2,
 #gotone,
@@ -34,7 +42,8 @@ h1 {
 #bonus2,
 #bonus3,
 #gottwo,
-#bomb {
+#bomb,
+#bomb_2 {
   width: 50px;
   height: auto;
   position: fixed;
@@ -83,6 +92,16 @@ h1 {
 
   100% {
     rotate: 360deg;
+  }
+}
+
+@keyframes show-hands {
+  0% {
+    width: 150px;
+  }
+
+  100% {
+    width: 100px;
   }
 }
 
@@ -197,7 +216,7 @@ h1 {
   text-align: center;
   align-items: center;
   position: relative;
-  overflow-y: visible;
+  overflow: hidden;
 }
 
 #result-btn-have_phone {
@@ -511,4 +530,8 @@ h1 {
   height: 45%;
   color: white;
   transform: translate(-50%, -50%);
+}
+
+.hidden {
+  display: none;
 }

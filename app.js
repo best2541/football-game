@@ -22,11 +22,11 @@ const knex = require('knex')(options)
 global.knex = knex
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'central',
-});
+    host: process.env.HOST,
+    user: process.env.ROOT,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE
+})
 global.db = db
 app.use('/game', require('./routes/game.js'))
 // app.use('/dashboard')

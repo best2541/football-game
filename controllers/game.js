@@ -10,8 +10,16 @@ module.exports = {
         req.data = {}
         next()
     },
+    getServerStatus: (req, res, next) => {
+        db.query(`select server_status.status as server_status from server_status`
+            , (err, result) => {
+                if (err) res.status(400).send({ err: err.message })
+                req.datas.server_status = result[0]
+                next()
+            })
+    },
     getstart: (req, res, next) => {
-        db.query(`select profile.uid , profile.phone , profile.name , server_status.status as server_status , hard_setting.* from profile CROSS JOIN server_status CROSS JOIN hard_setting where profile.uid = '1234'`
+        db.query(`select profile.uid , profile.phone , profile.name , hard_setting.* from profile CROSS JOIN hard_setting where profile.uid = '12345'`
             , (err, result) => {
                 if (err) res.status(400).send({ err: err.message })
                 req.datas.user = result

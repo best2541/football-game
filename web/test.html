@@ -1,95 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrollable Container with Cards Example</title>
-    <style>
-        .scrollable-container {
-            width: 300px;
-            /* Set your desired width */
-            height: 200px;
-            /* Set your desired height */
-            border: 1px solid #ccc;
-            overflow-y: auto;
-            /* Enable vertical scrollbar when content exceeds height */
-            padding: 10px;
-            /* Optional: Add padding for content */
-        }
-
-        .card {
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Click Image Effect</title>
+<style>
+    #container {
+        position: relative;
+        width: 400px;
+        height: 300px;
+        border: 1px solid #ccc;
+    }
+    .click-image {
+        position: absolute;
+        display: none;
+    }
+</style>
 </head>
-
 <body>
 
-    <div class="scrollable-container" id="scrollable-container" onscroll="isCard4Visible()">
-        <!-- Card 1 -->
-        <div class="card">
-            <h3>Card 1</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        </div>
+<div id="container">
+    <img src="background.jpg" id="main-image" alt="Main Image">
+</div>
 
-        <!-- Card 2 -->
-        <div class="card">
-            <h3>Card 2</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        </div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var container = document.getElementById("container");
+    var mainImage = document.getElementById("main-image");
 
-        <!-- Card 3 -->
-        <div class="card">
-            <h3>Card 3</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        </div>
+    mainImage.addEventListener("click", function(event) {
+        var clickImage = document.createElement("img");
+        clickImage.src = "hand.png"; // Change this to your image source
+        clickImage.classList.add("click-image");
 
-        <!-- Card 4 -->
-        <div class="card" id="card-4">
-            <h3>Card 4</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        </div>
+        // Calculate the position of the click relative to the container
+        var rect = container.getBoundingClientRect();
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
 
-        <!-- Card 5 -->
-        <div class="card">
-            <h3>Card 5</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        </div>
-    </div>
+        clickImage.style.left = x + "px";
+        clickImage.style.top = y + "px";
 
-    <script>
-        // Check if Card 4 is visible
-        function isCard4Visible() {
-            var container = document.getElementById('scrollable-container');
-            var card4 = document.getElementById('card-4');
+        container.appendChild(clickImage);
 
-            var containerRect = container.getBoundingClientRect();
-            var card4Rect = card4.getBoundingClientRect();
-
-            console.log('containerRect', containerRect)
-            console.log('card4Rect', card4Rect)
-            // Check if any part of Card 4 is visible
-            return (
-                card4Rect.top < containerRect.bottom &&
-                card4Rect.bottom > containerRect.top
-            );
-        }
-
-        // Example usage
-        window.addEventListener('scroll', function () {
-            if (isCard4Visible()) {
-                console.log('Card 4 is visible');
-            } else {
-                console.log('Card 4 is not visible');
-            }
-        });
-    </script>
+        // After 1 second, remove the click image
+        setTimeout(function() {
+            container.removeChild(clickImage);
+        }, 1000);
+    });
+});
+</script>
 
 </body>
-
 </html>
