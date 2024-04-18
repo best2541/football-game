@@ -1,0 +1,22 @@
+POST http://localhost:3000/game/save
+Content-Type: application/json
+
+{
+    "uid":"12345",
+    "score":"0",
+    "name":"pawat"
+}
+###
+GET http://localhost:3000/game/getstart
+Content-Type: application/json
+
+{
+
+}
+###
+GET http://localhost:3000/game/getranking?uid=1234
+Content-Type: application/json
+
+{
+
+}

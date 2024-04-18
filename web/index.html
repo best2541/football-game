@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goalkeeper Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- maintain -->
+    <div id="maintain-containner" style="display: none;">
+        <!-- <div class="blackdrop">
+            <div class="navbar">
+                <img src="./img/company.png" class="center-img" style="width: 60%;">
+            </div>
+            <div class="thank">
+                <h1>คุณอยู่ลำดับที่</h1>
+                <br /><br />
+                <h1>ขอขอบคุณ</h1>
+                <h1>ที่ร่วมสนุกกิจกรรม</h1>
+            </div>
+            <div id="startBtn2" class="">
+                <button id="begin" onclick="startGame()">
+                    <img src="./img/BTN-Start.png" style="width: 100%;height: auto;"></img>
+                </button>
+                <br />
+                <br />
+                <button id="condi">
+                    <img src="./img/BTN(CONDI)-Start.png" style="width: 100%;height: auto;">
+                </button>
+            </div>
+        </div> -->
+        <img src="./img/text-maintain.png" class="text-maintain">
+        <img src="./img/bg-maintain.jpg" class="background">
+    </div>
+    <!-- start -->
+    <div id="start-containner">
+        <img src="./img/BG.jpg" class="background">
+        <img src="./img/company.png" class="company-img">
+        <img src="./img/LOGO.png" class="logo-img">
+        <img src="./img/info.png" class="info-img">
+        <div id="startBtn2" class="align-middle">
+            <button id="begin" onclick="startGame()">
+                <img src="./img/BTN-Start.png" style="width: 100%;height: auto;"></img>
+            </button>
+            <br />
+            <br />
+            <button id="condi">
+                <img src="./img/BTN(CONDI)-Start.png" style="width: 100%;height: auto;">
+            </button>
+        </div>
+    </div>
+    <!-- result -->
+    <div id="result-containner" style="display: none;">
+        <div class="header border-bt-curve">
+            <h4 style="margin-top: 3%;">ยินดีด้วย รอบนี้คุณได้คะแนน</h4>
+            <h1 id="score-sum">0</h1>
+        </div>
+        <div class="leaderboard">
+            <div id="first_place">
+                <img id="first_place-img" class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
+                <p id="first_place-name" class="color-blue"></p>
+                <p id="first_place-score" class="color-red"></p>
+            </div>
+            <div id="second_place">
+                <img id="second_place-img" class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
+                <p id="second_place-name" class="color-blue"></p>
+                <p id="second_place-score" class="color-red"></p>
+            </div>
+            <div id="third_place">
+                <img id="third_place-img" class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
+                <p id="third_place-name" class="color-blue"></p>
+                <p id="third_place-score" class="color-red"></p>
+            </div>
+            <div id="sub-leaderboard" class="sub-leaderboard">
+            </div>
+            <div id="fix-leaderboard" class="fix-leaderboard" style="display: none;">
+                <div class="card-leaderboard blue-border">
+                    <img class="you" src="./img/you.png">
+                    <div class="d-flex">
+                        <div id="yourRank">
+                        </div>
+                        <div id="yourName" class="name">
+                            <img class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
+                        </div>
+                        <div id="yourScore" class="color-red">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="./img/BG-Leaderboard.png" style="width: 100%;height: 100%;">
+        </div>
+        <form id="result-form" class="result-form">
+            <div style="position: relative;">
+                <img src="./img/Mobile-Fill.png" style="width: 100%;height: 100%;">
+                <input id="phone" class="trans"
+                    style="position: absolute;width: 80%;height: 80%;left: 10%;top:20%;background-color: transparent;border: transparent;"
+                    required />
+            </div>
+            <button id="result-btn-haveno_phone" class="btn btn-success btn-block btn-lg border-curve-btn my-2"
+                type="submit">
+                บันทึกคะแนน
+            </button>
+        </form>
+        <form id="result-form-phone" class="result-form">
+            <h4 class="color-white" style="margin-bottom: 2rem;">ขอขอบคุณที่ร่วมสนุกกิจกรรม</h4>
+            <button id="result-btn-have_phone" class="btn btn-block btn-lg border-curve-btn color-white my-2"
+                type="button" onclick="startGame()">
+                เล่นใหม่อีกครั้ง
+            </button>
+        </form>
+        <img src="./img/BG.jpg" class="result-background">
+    </div>
+    <!-- thankyou -->
+    <div id="thankyou-containner" style="display: none;">
+        <div class="blackdrop">
+            <div class="navbar">
+                <img src="./img/company.png" class="center-img" style="width: 60%;">
+            </div>
+            <div class="thank">
+                <h1>คุณอยู่ลำดับที่</h1>
+                <div id="thank-card" class="card-leaderboard">
+
+                </div>
+                <h1>ขอขอบคุณ</h1>
+                <h1>ที่ร่วมสนุกกิจกรรม</h1>
+            </div>
+            <div id="startBtn2" class="">
+                <button id="begin" onclick="startGame()">
+                    <img src="./img/BTN-Start.png" style="width: 100%;height: auto;"></img>
+                </button>
+                <br />
+                <br />
+                <button id="condi">
+                    <img src="./img/BTN(CONDI)-Start.png" style="width: 100%;height: auto;">
+                </button>
+            </div>
+        </div>
+        <img src="./img/BG.jpg" class="background">
+    </div>
+    <!-- game -->
+    <div id="containner" style="display: none;">
+        <div id="countdown-section">
+            <div class="blackdrop"></div>
+            <div class="countdown">
+                <div id="countdown-number" class="countdown-number">
+                    3
+                </div>
+            </div>
+        </div>
+        <img src="./background.jpg" class="background">
+        <div id="football" style="display: none;">
+            <img class="football" src="./img/football.png"></img>
+        </div>
+        <!-- <div id="football_2" style="display: none;">
+            <img class="football" src="./img/FOOTBALL.png"></img>
+        </div> -->
+        <img id="gotone" src="./img/gotone.png" style="display: none;"></img>
+        <div id="bonus1" src="./img/bonus.png" style="display: none;">
+            <img class="bonus" src="./img/A-CHOICE.png"></img>
+        </div>
+        <div id="bonus2" src="./img/bonus.png" style="display: none;">
+            <img class="bonus" src="./img/A-ROY.png"></img>
+        </div>
+        <div id="bonus3" src="./img/bonus.png" style="display: none;">
+            <img class="bonus" src="./img/SUPERSAVE.png"></img>
+        </div>
+        <div id="bomb" style="display: none;">
+            <img class="bomb" src="./img/bomb.png"></img>
+        </div>
+
+        <img id="gottwo" src="./img/gottwo.png" style="display: none;"></img>
+        <div id="time">0:00</div>
+        <div id="score"><img id="score-img" src="./img/score.png" width="100%"><span id="score-value">0</span></div>
+    </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
