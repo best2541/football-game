@@ -3,7 +3,8 @@ const express = require('express')
 const app = express()
 const mysql = require('mysql2')
 const cors = require('cors')
-const path = require("path");
+const path = require("path")
+const encrypt = require('./utilities/encrypt')
 
 app.use(express.json())
 app.use(express.urlencoded())
@@ -29,13 +30,27 @@ const db = mysql.createConnection({
 })
 global.db = db
 app.use('/game', require('./routes/game.js'))
-// app.use('/dashboard')
+app.use('/dashboard', require('./routes/dashboard.js'))
 
 app.get('/test', (req, res) => {
     res.send('test : ok')
 })
 
 app.get('/schema', (req, res) => {
+    knex.schema.createTable('admin', (table) => {
+        table.string('username').primary()
+        table.string('password').notNullable()
+        table.datetime('create_at').defaultTo(knex.raw('(CURRENT_DATE())'))
+    })
+        .then(() => console.log('admin created'))
+        .finally(async () => {
+            const ps = await encrypt('password').then(result => result)
+            knex('admin')
+                .insert({ username: 'admin', password: ps })
+                .then(() => console.log('admin data inserted'))
+                .catch(() => console.log('admin data skip'))
+        })
+        .catch(() => console.log('admin skip'))
     knex.schema.createTable('profile', (table) => {
         table.string('uid', 255).primary(),
             table.string('phone', 11),

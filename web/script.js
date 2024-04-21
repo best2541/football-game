@@ -452,7 +452,7 @@ document.addEventListener("DOMContentLoaded", function() {
   var container = document.getElementById("containner");
   var handImage = document.getElementById("hand");
 
-  container.addEventListener("click", function(event) {
+  container.addEventListener("mousedown", function(event) {
       // Prevent default click behavior
       event.preventDefault();
       
