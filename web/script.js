@@ -1,5 +1,6 @@
 // let time = performance.now()
 let score = 0;
+let totalScore = 0
 let footballX = window.innerWidth / 2; // Initial X position
 let footballY = window.innerHeight / 2; // Start at the bottom of the screen
 let footballX_2 = window.innerWidth / 2; // Initial X position
@@ -74,7 +75,7 @@ function getStart() {
         window.localStorage.setItem('uid', result.data.user[0].uid)
         window.localStorage.setItem('name', result.data.user[0].name)
         window.localStorage.setItem('image', result.data.user[0].picture)
-
+        totalScore = result.data.user[0].score
         if (result.data.user[0].phone)
           window.localStorage.setItem('phone', result.data.user[0].phone)
 
@@ -109,23 +110,28 @@ function gameOver() {
           if (result.data.ranking.length > 0) {
             const containner = document.getElementById('sub-leaderboard')
             await result.data.ranking?.map(data => {
+              if (data.role == 'you')
+                totalScore = data.score
               if (data.rank == 1) {
-                document.getElementById('first_place-name').innerHTML = data.name
+                document.getElementById('first_place-img').style.display = 'inline-block'
+                document.getElementById('first_place-name').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('first_place-score').innerHTML = data.score
                 document.getElementById('thankRank').innerHTML = 1
-                document.getElementById('thankName').innerHTML = data.name
+                document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 2) {
-                document.getElementById('second_place-name').innerHTML = data.name
+                document.getElementById('second_place-img').style.display = 'inline-block'
+                document.getElementById('second_place-name').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('second_place-score').innerHTML = data.score
                 document.getElementById('thankRank').innerHTML = 2
-                document.getElementById('thankName').innerHTML = data.name
+                document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 3) {
-                document.getElementById('third_place-name').innerHTML = data.name
+                document.getElementById('third_place-img').style.display = 'inline-block'
+                document.getElementById('third_place-name').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('third_place-score').innerHTML = data.score
                 document.getElementById('thankRank').innerHTML = 3
-                document.getElementById('thankName').innerHTML = data.name
+                document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
               } else {
                 const card = document.createElement("div")
@@ -136,14 +142,14 @@ function gameOver() {
                 const content = `
                 ${data.role == 'you' ? '<img class="you" style="z-index: 1000;" src="./img/you.png">' : ''}
                 <div class="d-flex">
-                    <div>
+                    <div style="width: 20%;">
                     ${data.rank}
                     </div>
-                    <div class="name">
+                    <div class="name" style="width: 50%;">
                     <img class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
-                    ${data.name}
+                    เบอร์ลงท้าย${data.phone.slice(-4)}
                     </div>
-                    <div class="color-red">
+                    <div class="color-red" style="width: 30%;">
                     ${data.score}
                     </div>
                 </div>
@@ -155,10 +161,11 @@ function gameOver() {
             window.location.href = '#you'
           }
           if (result.data.yourRank) {
+            totalScore = result.data.yourRank[0].score
             document.getElementById('sub-leaderboard').style.height = '35%'
             document.getElementById('fix-leaderboard').style.display = 'block'
             document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
-            document.getElementById('yourName').innerHTML = '<img class="user-img" src="./img/user.png" style="width: 20px;height: auto;">' + ' ' + result.data.yourRank[0].name
+            document.getElementById('yourName').innerHTML = '<img class="user-img" src="./img/user.png" style="width: 20px;height: auto;">' + ' ' + 'เบอร์ลงท้าย' + result.data.yourRank[0].phone.slice(-4)
             document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
           } else {
             document.getElementById('sub-leaderboard').style.height = '50%'
@@ -168,14 +175,6 @@ function gameOver() {
     }).catch(() => {
       alert('การบันทึกไม่สำเร็จ กรุณาลองใหม่ภายหลัง')
     })
-}
-
-function asyncFunction() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve("Data fetched successfully");
-    }, 700);
-  });
 }
 
 function getRandomNumber() {
@@ -206,13 +205,18 @@ function decreaseLevel() {
 }
 
 function submit(e) {
-  // const name = document.getElementById('name')
   const phone = document.getElementById('phone')
   const thankyou = document.getElementById('thankyou-containner')
   const result = document.getElementById('result-containner')
+  const thankRank = document.getElementById('thankRank')
+  const thankName = document.getElementById('thankName')
+  const thankScore = document.getElementById('thankScore')
   e.preventDefault();
-  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: phone.value })
-    .then(() => {
+  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString() })
+    .then(res => {
+      thankRank.innerHTML = res.data.rank
+      thankName.innerHTML = `เบอร์ลงท้าย${res.data.phone.slice(-4)}`
+      thankScore.innerHTML = res.data.score
       result.style.display = 'none'
       thankyou.style.display = 'block'
       window.localStorage.setItem('phone', phone.value)
@@ -233,8 +237,8 @@ async function updateFootballPosition() {
   timeCounter_2 += 5
   const percen = timeCounter / (moveUpTime / hardLevel)
   const percen_2 = timeCounter_2 / (moveUpTime / hardLevel)
-  if (percen_2 < 100 && cooldown_2 == 0) {
-    if (random_2 > 0.8) {
+  if (percen_2 < 100 && cooldown_2 == 0 && !isOver) {
+    if (random_2 > (totalScore > 3000 ? 0.5 : totalScore > 2000 ? 0.6 : totalScore > 1000 ? 0.7 : 0.8)) {
       bomb_2.style.width = 50 + (percen_2 + 8) + 'px'
       bomb_2.style.height = 50 + percen_2 + 'px'
       bomb_2.style.display = 'block';
@@ -252,13 +256,13 @@ async function updateFootballPosition() {
     footballX_2 = window.innerWidth / 2 // Reset X position
     footballY_2 = window.innerHeight / 2 // Reset Y position
   }
-  if (percen < 100 && cooldown == 0) {
-    if (random > 0.8) {
+  if (percen < 100 && cooldown == 0 && !isOver) {
+    if (random > (totalScore > 3000 ? 0.5 : totalScore > 2000 ? 0.6 : totalScore > 1000 ? 0.7 : 0.8)) {
       bomb.style.width = 50 + (percen + 8) + 'px'
       bomb.style.height = 50 + percen + 'px'
       bomb.style.display = 'block';
       // bomb.style.rotate = percen * 1.70 + 'deg'
-    } else if (random > 0.5) {
+    } else if (random > totalScore > 3000 ? 0.4 : 0.5) {
       bonus.style.width = 50 + percen + 'px'
       bonus.style.height = 'auto'
       bonus.style.display = 'block';
@@ -314,8 +318,8 @@ async function updateFootballPosition() {
       cooldown_2 = 200
       getRandomNumber_2()
     }
-    requestAnimationFrame(updateFootballPosition); // Update position in the next frame
   }
+  requestAnimationFrame(updateFootballPosition); // Update position in the next frame
 }
 
 document.getElementById('result-form').addEventListener('submit', function (event) {
@@ -400,10 +404,6 @@ document.getElementById('bomb').addEventListener('mousedown', function () {
 document.getElementById('bomb_2').addEventListener('mousedown', function () {
   bombClick(this)
 })
-// document.addEventListener('DOMContentLoaded', function () {
-//   document.getElementById('football').style.top = footballY + 'px';
-//   document.getElementById('football').style.left = footballX + 'px';
-// })
 
 const setTimer = () => {
   console.log('timer start')
@@ -425,15 +425,12 @@ const setTimer = () => {
 const startGame = () => {
   score = 0
   document.getElementById('score-value').textContent = 0
-  // document.getElementById('countdown-number').innerHTML = 3
-  // document.getElementById('countdown-section').style.display = 'block'
   document.getElementById('start-containner').style.display = 'none'
   document.getElementById('thankyou-containner').style.display = 'none'
   document.getElementById('result-containner').style.display = 'none'
   document.getElementById('containner').style.display = 'block'
   let countdownValue = 3
   score = 0
-  isOver = false
   const myCountdown = setInterval(() => {
     document.getElementById('countdown-section').style.display = 'none'
     document.getElementById('countdown-section').style.display = 'block'
@@ -443,35 +440,36 @@ const startGame = () => {
       clearInterval(myCountdown)
       document.getElementById('countdown-section').style.display = 'none'
       setTimer()
+      isOver = false
       updateFootballPosition()
     }
   }, 1000)
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  var container = document.getElementById("containner");
-  var handImage = document.getElementById("hand");
+document.addEventListener("DOMContentLoaded", function () {
+  var container = document.getElementById("containner")
+  var handImage = document.getElementById("hand")
 
-  container.addEventListener("mousedown", function(event) {
-      // Prevent default click behavior
-      event.preventDefault();
-      
-      // Calculate click position relative to container
-      var rect = container.getBoundingClientRect();
-      var x = event.clientX - rect.left;
-      var y = event.clientY - rect.top;
+  container.addEventListener("mousedown", function (event) {
+    // Prevent default click behavior
+    event.preventDefault();
 
-      // Set hand image position
-      handImage.style.left = x + "px";
-      handImage.style.top = y + "px";
+    // Calculate click position relative to container
+    var rect = container.getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
 
-      // Show hand image
-      handImage.classList.remove("hidden");
+    // Set hand image position
+    handImage.style.left = x + "px";
+    handImage.style.top = y + "px";
 
-      // Hide hand image after 1 second
-      setTimeout(function() {
-          handImage.classList.add("hidden");
-      }, 300);
+    // Show hand image
+    handImage.classList.remove("hidden");
+
+    // Hide hand image after 1 second
+    setTimeout(function () {
+      handImage.classList.add("hidden");
+    }, 300);
   });
 })
 //ปิดtab

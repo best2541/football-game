@@ -26,7 +26,6 @@ module.exports = {
                         res.send({ err: 'username ไม่มีในระบบ' })
                     }
                 })
-            // .catch(err => console.log(err))
         }).catch(err => res.send({ err }))
     },
     getProfile: (req, res, next) => {
@@ -40,5 +39,107 @@ module.exports = {
             .catch((err) => {
                 res.status(500).send({ err: err.message })
             })
+    },
+    getDashboard: async (req, res, next) => {
+        try {
+            await knex('profile')
+                .count('phone', { as: 'totalUsers' })
+                .then(result => {
+                    req.datas.totalUsers = result[0]?.totalUsers
+                })
+            await knex('play_record')
+                .count('id', { as: 'allTimePlay' })
+                .then(result => {
+                    req.datas.allTimePlay = result[0]?.allTimePlay
+                })
+            await knex('play_record')
+                .select('uid', 'create_date')
+                .whereRaw('DATE(create_date) = CURRENT_DATE')
+                .then(result => {
+                    req.datas.playToday = result
+                })
+            next()
+        } catch (err) {
+            res.status(500).send({ err: err.message })
+        }
+    },
+    getTable: (req, res, next) => {
+        try {
+            const search = req.query.search
+            db.query(`SELECT name, score, 
+            @rank := @rank + 1
+            AS rank
+            FROM (
+                SELECT name, score
+                FROM (
+                    SELECT name, score
+                    FROM profile 
+                    WHERE name LIKE '%${search}%' OR phone LIKE '%${search}%'
+                    ORDER BY score DESC 
+					LIMIT 999
+                ) AS a
+            ) AS ranks,
+            (SELECT @rank := 0) AS ordr;`
+                , async (err, result) => {
+                    if (err) throw err
+                    req.datas.ranking = result
+                    next()
+                })
+        } catch (err) {
+            res.status(500).send({ err: err.message })
+        }
+    },
+    getReport: (req, res, next) => {
+        try {
+            const { search } = req.query
+            db.query(`SELECT uid, name, score, update_date,
+            @rank := @rank + 1
+            AS rank
+            FROM (
+                SELECT uid, name, score, update_date
+                FROM (
+                    SELECT uid, name, score, update_date
+                    FROM profile 
+                    WHERE name LIKE '%${search || ''}%' OR phone LIKE '%${search || ''}%'
+                    ORDER BY score DESC 
+					LIMIT 999
+                ) AS a
+            ) AS ranks,
+            (SELECT @rank := 0) AS ordr;`
+                , async (err, result) => {
+                    if (err) throw err
+                    req.datas.ranking = result
+                    next()
+                })
+        } catch (err) {
+            res.status(500).send({ err: err.message })
+        }
+    },
+    getReportByID: async (req, res, next) => {
+        const { id } = req.params
+        try {
+            await knex('play_record')
+                .select('score', 'device', 'create_date')
+                .where('uid', id)
+                .orderBy('create_date', 'desc')
+                .then(result => {
+                    req.datas.table = result
+                })
+            await knex.raw(`select a.name, b.rank, a.score, c.feq from (
+                select name, score from profile where uid = '${id}'
+                ) as a,
+                (
+                select COUNT(uid) as rank from profile where uid = '${id}' AND score >= (select score from profile where uid = '${id}')
+                ) as b,
+                (
+                select COUNT(id) as feq from play_record where uid = '${id}'
+                ) as c`)
+                .then(result => {
+                    req.datas.report = result[0][0]
+                    next()
+                })
+        } catch (err) {
+            res.status(500).send({ err: err.message })
+        }
     }
 }

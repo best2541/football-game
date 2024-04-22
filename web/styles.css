@@ -245,6 +245,21 @@ h1 {
   transform: translate(-50%, -50%);
 }
 
+#thankRank,
+#yourRank {
+  width: 20%;
+}
+
+#thankName,
+#yourName {
+  width: 50%;
+}
+
+#thankScore,
+#yourScore {
+  width: 30%;
+}
+
 .d-flex {
   position: relative;
   display: flex;
@@ -496,6 +511,10 @@ h1 {
 
 .p-2 {
   padding: 2rem !important;
+}
+
+.m-0 {
+  margin: 0;
 }
 
 .m-2 {

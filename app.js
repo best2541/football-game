@@ -40,7 +40,7 @@ app.get('/schema', (req, res) => {
     knex.schema.createTable('admin', (table) => {
         table.string('username').primary()
         table.string('password').notNullable()
-        table.datetime('create_at').defaultTo(knex.raw('(CURRENT_DATE())'))
+        table.datetime('create_at').defaultTo(knex.raw('(CURRENT_TIMESTAMP())'))
     })
         .then(() => console.log('admin created'))
         .finally(async () => {
@@ -56,8 +56,8 @@ app.get('/schema', (req, res) => {
             table.string('phone', 11),
             table.string('name', 50),
             table.integer('score').defaultTo(0),
-            table.timestamp('create_date').defaultTo(knex.raw('(CURRENT_DATE())')),
-            table.timestamp('update_date').defaultTo(knex.raw('(CURRENT_DATE())'))
+            table.timestamp('create_date').defaultTo(knex.raw('(CURRENT_TIMESTAMP())')),
+            table.timestamp('update_date').defaultTo(knex.raw('(CURRENT_TIMESTAMP())'))
     })
         .then(() => console.log('profile created'))
         .catch((err) => console.log('profile skip'))
@@ -66,7 +66,7 @@ app.get('/schema', (req, res) => {
             table.string('uid', 255).notNullable(),
             table.string('device', 50),
             table.integer('score').defaultTo(0).notNullable(),
-            table.timestamp('create_date').defaultTo(knex.raw('(CURRENT_DATE())'))
+            table.timestamp('create_date').defaultTo(knex.raw('(CURRENT_TIMESTAMP())'))
     })
         .then(() => console.log('play_record created'))
         .catch(err => console.log('play_record skip'))

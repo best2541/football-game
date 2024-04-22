@@ -19,7 +19,7 @@ module.exports = {
             })
     },
     getstart: (req, res, next) => {
-        db.query(`select profile.uid , profile.phone , profile.name , hard_setting.* from profile CROSS JOIN hard_setting where profile.uid = '12345'`
+        db.query(`select profile.uid , profile.phone , profile.name , profile.score , hard_setting.* from profile CROSS JOIN hard_setting where profile.uid = '12345'`
             , (err, result) => {
                 if (err) res.status(400).send({ err: err.message })
                 req.datas.user = result
@@ -42,7 +42,7 @@ module.exports = {
                         , (err, result) => {
                             if (err) console.log('err1', err)
                             if (err) throw err
-                            db.query(`insert into profile (uid,score,name) values (${uid},${score},'${name}') on DUPLICATE key update score = score+${score}`,
+                            db.query(`insert into profile (uid,score,name) values (${uid},${score},'${name}') on DUPLICATE key update score = score+${score}, update_date = CURRENT_TIMESTAMP()`,
                                 (err, result2) => {
                                     if (err) console.log('err2', err)
                                     if (err) throw err
@@ -54,10 +54,23 @@ module.exports = {
                 .catch(() => {
                     validate(req, ['uid', 'phone'])
                         .then(() => {
-                            db.query(`update profile set phone = ${req.body.phone} where uid = ${req.body.uid}`
+                            db.query(`update profile set phone = '${(req.body.phone).toString()}', update_date = CURRENT_TIMESTAMP() where uid = ${req.body.uid}`
                                 , (err, result) => {
                                     if (err) throw err
-                                    res.send('ok')
+                                    db.query(`SELECT a.name, a.phone, b.rank, a.score 
+                                    FROM (
+                                        SELECT name, phone, score 
+                                        FROM profile 
+                                        WHERE uid = '${req.body.uid}'
+                                    ) AS a
+                                    CROSS JOIN (
+                                        SELECT COUNT(uid) as rank 
+                                        FROM profile 
+                                        WHERE uid = '${req.body.uid}' AND score >= (SELECT score FROM profile WHERE uid = '${req.body.uid}')
+                                    ) AS b;`, (err, result) => {
+                                        if (err) throw err
+                                        res.send(result[0])
+                                    })
                                 })
                         })
                         .catch(err2 => res.status(400).send({ err: err2.message }))
@@ -69,25 +82,25 @@ module.exports = {
     getRanking: (req, res, next) => {
         try {
             const uid = req.query.uid
-            db.query(`SELECT role, name, score, 
-            @rank := @rank + 1
-            AS rank
+            db.query(`SELECT role, name, score, phone, @rank := @rank + 1 AS rank
             FROM (
-                SELECT role, name, score
+                SELECT role, name, score, phone
                 FROM (
-                    SELECT IF(uid = '${uid}', 'you', '') as role, name, score
+                    SELECT IF(uid = '${uid}', 'you', '') as role, name, score, phone
                     FROM profile 
+                    WHERE phone IS NOT NULL
                     ORDER BY score DESC 
-					LIMIT 999
+                    LIMIT 999
                 ) AS a
             ) AS ranks,
-            (SELECT @rank := 0) AS ordr;`
+            (SELECT @rank := 0) AS ordr;
+            `
                 , async (err, result) => {
                     if (err) throw err
                     req.datas.ranking = result
                     const yourRank = await result.filter(x => x.role == 'you')
                     if (yourRank.length === 0) {
-                        db.query(`select '999+' as role, name, score from profile where uid = '${uid}'`
+                        db.query(`select '999+' as role, name, phone, score from profile where uid = '${uid}'`
                             , (err, yourResult) => {
                                 if (err) throw err
                                 req.datas.yourRank = yourResult
