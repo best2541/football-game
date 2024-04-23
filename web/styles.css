@@ -240,7 +240,7 @@ h1 {
 
 #third_place {
   position: absolute;
-  top: 30%;
+  top: 29%;
   left: 73%;
   transform: translate(-50%, -50%);
 }
@@ -285,9 +285,10 @@ h1 {
   width: 40%;
 }
 
-.d-flex>div>.name {
-  text-align: left !important;
-  width: 40%;
+.name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .sticky-bottom {
@@ -553,4 +554,40 @@ h1 {
 
 .hidden {
   display: none;
+}
+
+.text-sm {
+  font-size: x-small !important;
+}
+
+.modal-content {
+  background-color: rgba(58, 57, 57, 0.849) !important;
+  color: white;
+  border: 3px solid white !important;
+  border-radius: 20px !important;
+  overflow-y: auto !important;
+  height: 80vh !important;
+}
+
+.modal-body {
+  background-color: rgba(54, 52, 52, 0.096) !important;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  /* width of the scrollbar */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #f80000;
+  /* color of the handle */
+  border-radius: 20px;
+  /* border radius of the handle */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+  /* color of the handle on hover */
 }

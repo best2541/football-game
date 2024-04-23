@@ -16,8 +16,19 @@ module.exports = {
                         const validPassword = await bcrypt.compare(req.body.password, password);
                         if (validPassword) {
                             // Send JWT
-                            const token = jwt.sign({ username, password, role: 'admin' }, process.env.SECRET, { expiresIn: '1d' })
-                            return res.send(token)
+                            const token = jwt.sign({ username, role: 'admin' }, process.env.SECRET, { expiresIn: '1d' })
+                            return res.send({
+                                "userData": {
+                                    "role": "admin",
+                                    "ability": [
+                                        {
+                                            "action": "manage",
+                                            "subject": "all"
+                                        }
+                                    ],
+                                },
+                                "accessToken": token,
+                            })
                         } else {
                             // handle error
                             res.send({ err: 'password ไม่ถูกต้อง' })
@@ -66,13 +77,13 @@ module.exports = {
     getTable: (req, res, next) => {
         try {
             const search = req.query.search
-            db.query(`SELECT name, score, 
+            db.query(`SELECT name, score, phone,
             @rank := @rank + 1
             AS rank
             FROM (
-                SELECT name, score
+                SELECT name, phone, score
                 FROM (
-                    SELECT name, score
+                    SELECT name, score, phone
                     FROM profile 
                     WHERE name LIKE '%${search}%' OR phone LIKE '%${search}%'
                     ORDER BY score DESC 
@@ -92,11 +103,11 @@ module.exports = {
     getReport: (req, res, next) => {
         try {
             const { search } = req.query
-            db.query(`SELECT uid, name, score, update_date,
+            db.query(`SELECT uid, name, phone, score, update_date,
             @rank := @rank + 1
             AS rank
             FROM (
-                SELECT uid, name, score, update_date
+                SELECT uid, name, phone, score, update_date
                 FROM (
                     SELECT uid, name, score, update_date
                     FROM profile 
@@ -112,6 +123,35 @@ module.exports = {
                     next()
                 })
         } catch (err) {
+            res.status(500).send({ err: err.message })
+        }
+    },
+    getLogs: async (req, res, next) => {
+        try {
+            const { search, start, end } = req.query
+            let query = knex('play_record').select('profile.phone', 'profile.name', 'play_record.score', 'play_record.device', 'play_record.create_date')
+                .join('profile', 'play_record.uid', '=', 'profile.uid')
+                .where(builder => {
+                    builder.where('profile.phone', 'LIKE', `%${search}%`)
+                    if (start && end)
+                        builder.andWhereBetween('play_record.create_date', [new Date(start).toISOString().slice(0, 10), new Date(end).toISOString().slice(0, 10)])
+                })
+                .orWhere(builder => {
+                    builder.where('profile.name', 'LIKE', `%${search}%`)
+                        .andWhereBetween('play_record.create_date', [new Date(start).toLocaleDateString(), new Date(end).toLocaleDateString()])
+                })
+                .orWhere('profile.name', 'LIKE', `%${search}%`)
+                .orderBy('create_date', 'desc')
+            if (start && end) {
+                query.andWhere('play_record.create_date', '>', new Date(start).toISOString().slice(0, 10))
+                    .andWhere('play_record.create_date', '<', new Date(end).toISOString().slice(0, 10))
+            }
+            query.then(result => {
+                req.datas.ranking = result
+                next()
+            })
+        } catch (err) {
+            console.log(err)
             res.status(500).send({ err: err.message })
         }
     },

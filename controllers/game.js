@@ -100,7 +100,7 @@ module.exports = {
                     req.datas.ranking = result
                     const yourRank = await result.filter(x => x.role == 'you')
                     if (yourRank.length === 0) {
-                        db.query(`select '999+' as role, name, phone, score from profile where uid = '${uid}'`
+                        db.query(`select '999+' as role, name, phone, score from profile where uid = '${uid}' and phone is not null`
                             , (err, yourResult) => {
                                 if (err) throw err
                                 req.datas.yourRank = yourResult
