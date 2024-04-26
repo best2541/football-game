@@ -1,0 +1,11 @@
+SELECT role, name, score, phone, uid
+            FROM (
+                SELECT role, uid, name, score, phone
+                FROM (
+                    SELECT IF(uid = '${uid}', 'you', '') as role, uid, name, score, phone
+                    FROM profile 
+                    WHERE phone IS NOT NULL
+                    ORDER BY score DESC 
+                    LIMIT 999
+                ) AS a
+            ) AS ranks;

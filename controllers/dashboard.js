@@ -169,7 +169,7 @@ module.exports = {
                 select name, score from profile where uid = '${id}'
                 ) as a,
                 (
-                select COUNT(uid) as rank from profile where uid = '${id}' AND score >= (select score from profile where uid = '${id}')
+                select COUNT(uid)+1 as rank from profile where phone is not null AND score > (select score from profile where uid = '${id}')
                 ) as b,
                 (
                 select COUNT(id) as feq from play_record where uid = '${id}'
