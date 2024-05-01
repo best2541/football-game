@@ -364,6 +364,15 @@ h1 {
   background-size: cover;
 }
 
+.hand-bg {
+  width: 100%;
+  position: absolute;
+  bottom: 0%;
+  transform: translate(-50%, 0%);
+  left: 50%;
+  animation: moveHand 2s alternate-reverse infinite !important;
+}
+
 .header {
   position: absolute;
   top: 0;
@@ -390,6 +399,7 @@ h1 {
   width: 100%;
   height: 35%;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 999;
 }
 
@@ -455,6 +465,14 @@ h1 {
 .countdown-number {
   animation: increaseSize 1s infinite;
   /* Apply animation */
+}
+@keyframes moveHand {
+  0% {
+    width: 150%;
+  }
+  100% {
+    width: 180%;
+  }
 }
 
 @keyframes increaseSize {

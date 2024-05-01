@@ -69,7 +69,7 @@
         </div>
         <div class="leaderboard">
             <div id="first_place" style="width: 20%;">
-                <img id="first_place-img" class="user-img" src="./img/user.png"
+                <img id="first_place-img" class="user-img" src="./img/user.png" onerror="this.src='./img/user.png'"
                     style="display:none;width: 20px;height: auto;">
                 <div class="name" style="width: 100%;">
                     <p id="first_place-name" class="color-blue m-0 name"></p>
@@ -78,7 +78,7 @@
                 <p id="first_place-score" class="color-red m-0"></p>
             </div>
             <div id="second_place" style="width: 20%;">
-                <img id="second_place-img" class="user-img" src="./img/user.png"
+                <img id="second_place-img" class="user-img" src="./img/user.png" onerror="this.src='./img/user.png'"
                     style="display:none;width: 20px;height: auto;">
                 <div class="name" style="width: 100%;">
                     <p id="second_place-name" class="color-blue m-0 name" style="width: 100%;"></p>
@@ -87,7 +87,7 @@
                 <p id="second_place-score" class="color-red m-0"></p>
             </div>
             <div id="third_place" style="width: 20%;">
-                <img id="third_place-img" class="user-img" src="./img/user.png"
+                <img id="third_place-img" class="user-img" src="./img/user.png" onerror="this.src='./img/user.png'"
                     style="display:none;width: 20px;height: auto;">
                 <div class="name" style="width: 100%;">
                     <p id="third_place-name" class="color-blue m-0 name"></p>
@@ -104,7 +104,8 @@
                         <div id="yourRank" style="width: 10%;">
                         </div>
                         <div class="name" style="width: 40%;">
-                            <img class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
+                            <img id="yourImg" class="user-img" src="./img/user.png" style="width: 20px;height: auto;"
+                                onerror="this.src='./img/user.png'">
                             <span id="yourName"></span>
                         </div>
                         <div id="yourPhone" style="width: 30%;">
@@ -141,7 +142,7 @@
     <div id="thankyou-containner" style="display: none;">
         <div class="blackdrop">
             <div class="navbar">
-                <img src="./img/company.png" class="center-img" style="width: 60%;">
+                <img src="./img/company.png" class="center-img" style="width: 60%;" onerror="this.src='./img/user.png'">
             </div>
             <div class="thank">
                 <h1>คุณอยู่ลำดับที่</h1>
@@ -151,7 +152,8 @@
                         <div id="thankRank" style="width: 10%;">
                         </div>
                         <div class="name" style="width: 40%;">
-                            <img class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
+                            <img id="thankImg" class="user-img" src="./img/user.png" style="width: 20px;height: auto;"
+                                onerror="this.src='./img/user.png'">
                             <span id="thankName"></span>
                         </div>
                         <div style="width: 30%;">
@@ -187,13 +189,14 @@
                 </div>
             </div>
         </div>
-        <img src="./img/background.jpg" class="background">
+        <img src="./img/hand-start.png" class="hand-bg">
         <img src="./img/BG.jpg" class="background">
+        <!-- <img src="./img/background.jpg" class="background"> -->
         <div id="football" style="display: none;">
-            <img class="football" src="./img/football.png"></img>
+            <img id="ball1" class="football" src="./img/FOOTBALL.png" onerror="this.scr='./img/FOOTBALL.png'"></img>
         </div>
         <div id="football_2" style="display: none;">
-            <img class="football" src="./img/FOOTBALL.png"></img>
+            <img id="ball2" class="football" src="./img/FOOTBALL.png" onerror="this.scr='./img/FOOTBALL.png'"></img>
         </div>
         <img id="gotone" src="./img/gotone.png" style="display: none;"></img>
         <div id="bonus1" src="./img/bonus.png" style="display: none;">
@@ -206,10 +209,10 @@
             <img class="bonus" src="./img/SUPERSAVE.png"></img>
         </div>
         <div id="bomb" style="display: none;">
-            <img class="bomb" src="./img/bomb.png"></img>
+            <img class="bomb" src="./img/BOMB.png"></img>
         </div>
         <div id="bomb_2" style="display: none;">
-            <img class="bomb" src="./img/bomb.png"></img>
+            <img class="bomb" src="./img/BOMB.png" onerror="this.src='./img/BOMB.png'"></img>
         </div>
 
         <img src="./img/Hand.png" id="hand" alt="Hand Image" class="hidden">
