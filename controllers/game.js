@@ -81,9 +81,9 @@ module.exports = {
                                         WHERE uid = '${req.body.uid}'
                                     ) AS a
                                     CROSS JOIN (
-                                        SELECT COUNT(uid) + 1 'rank'
+                                        SELECT COUNT(uid) 'rank'
                                         FROM profile 
-                                        WHERE uid = '${req.body.uid}' AND score >= (SELECT score FROM profile WHERE uid = '${req.body.uid}')
+                                        WHERE score >= (SELECT score FROM profile WHERE uid = '${req.body.uid}')
                                     ) AS b;`, (err, result) => {
                                         if (err) throw err
                                         res.send(result[0])
@@ -106,7 +106,7 @@ module.exports = {
                     SELECT IF(uid = '${uid}', 'you', '') 'role', name, score, phone
                     FROM profile 
                     WHERE phone IS NOT NULL
-                    ORDER BY score DESC 
+                    ORDER BY score DESC , update_date ASC
                     LIMIT 999
                 ) AS a
             ) AS ranks,

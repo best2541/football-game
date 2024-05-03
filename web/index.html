@@ -28,9 +28,13 @@
         aria-hidden="true">
         <div class="modal-dialog p-2" role="document">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">กติกา</h5>
+                    <button type="button" class="close text-white color-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="modal-body">
-                    <p>กติกา
-                    </p>
                     <ul>
                         <li>สัมผัสหน้าจอเพื่อรับลูกฟุตบอล</li>
                         <li>ลูกฟุตบอลมี 3 แบบ: ปกติ (1 คะแนน) พิเศษมีโลโก้ (3 คะแนน) ระเบิด (Game Over)</li>
@@ -69,6 +73,7 @@
         </div>
         <div class="leaderboard">
             <div id="first_place" style="width: 20%;">
+                <img id="first_you" class="you" style="z-index: 1000;display: none;" src="./img/you.png">
                 <img id="first_place-img" class="user-img" src="./img/user.png" onerror="this.src='./img/user.png'"
                     style="display:none;width: 20px;height: auto;">
                 <div class="name" style="width: 100%;">
@@ -78,6 +83,7 @@
                 <p id="first_place-score" class="color-red m-0"></p>
             </div>
             <div id="second_place" style="width: 20%;">
+                <img id="second_you" class="you" style="z-index: 1000;display: none;" src="./img/you.png">
                 <img id="second_place-img" class="user-img" src="./img/user.png" onerror="this.src='./img/user.png'"
                     style="display:none;width: 20px;height: auto;">
                 <div class="name" style="width: 100%;">
@@ -87,6 +93,7 @@
                 <p id="second_place-score" class="color-red m-0"></p>
             </div>
             <div id="third_place" style="width: 20%;">
+                <img id="third_you" class="you" style="z-index: 1000;display: none;" src="./img/you.png">
                 <img id="third_place-img" class="user-img" src="./img/user.png" onerror="this.src='./img/user.png'"
                     style="display:none;width: 20px;height: auto;">
                 <div class="name" style="width: 100%;">

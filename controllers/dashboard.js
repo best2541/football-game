@@ -54,9 +54,11 @@ module.exports = {
     getDashboard: async (req, res, next) => {
         try {
             await knex('profile')
-                .count('phone', { as: 'totalUsers' })
+                .count('uid', { as: 'totalUsers' })
+                .count('phone', { as: 'totalUsersPhone' })
                 .then(result => {
                     req.datas.totalUsers = result[0]?.totalUsers
+                    req.datas.totalUsersPhone = result[0]?.totalUsersPhone
                 })
             await knex('play_record')
                 .count('id', { as: 'allTimePlay' })
@@ -86,7 +88,7 @@ module.exports = {
                 FROM (
                     SELECT name, score, phone
                     FROM profile 
-                    WHERE name LIKE '%${search}%' OR phone LIKE '%${search}%'
+                    WHERE (name LIKE '%${search}%' OR phone LIKE '%${search}%') AND phone IS NOT NULL
                     ORDER BY score DESC 
 					LIMIT 999
                 )as a

@@ -122,8 +122,10 @@ function gameOver() {
               if (data.role == 'you')
                 totalScore = data.score
               if (data.rank == 1) {
-                if (data.role == 'you')
+                if (data.role == 'you') {
                   document.getElementById('first_place-img').src = window.localStorage.getItem('image')
+                  document.getElementById('first_you').style.display = 'block'
+                }
                 document.getElementById('first_place-img').style.display = 'inline-block'
                 document.getElementById('first_place-name').innerHTML = data.name
                 document.getElementById('first_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -132,8 +134,10 @@ function gameOver() {
                 document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 2) {
-                if (data.role == 'you')
+                if (data.role == 'you') {
                   document.getElementById('second_place-img').src = window.localStorage.getItem('image')
+                  document.getElementById('second_you').style.display = 'block'
+                }
                 document.getElementById('second_place-img').style.display = 'inline-block'
                 document.getElementById('second_place-name').innerHTML = data.name
                 document.getElementById('second_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -142,8 +146,10 @@ function gameOver() {
                 document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 3) {
-                if (data.role == 'you')
+                if (data.role == 'you') {
                   document.getElementById('third_place-img').src = window.localStorage.getItem('image')
+                  document.getElementById('third_you').style.display = 'block'
+                }
                 document.getElementById('third_place-img').style.display = 'inline-block'
                 document.getElementById('third_place-name').innerHTML = data.name
                 document.getElementById('third_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -168,7 +174,7 @@ function gameOver() {
                   ${data.name}
                 </div>
                 <div class="" style="width: 30%;">
-                  <span class="text-sm">เบอร์ลงท้าย</span>${data.phone.slice(-4)}
+                  <span class="text-sm">เบอร์</span>${data.phone.slice(-4)}
                 </div>
                 <div class="color-red" style="width: 20%;">
                   ${data.score}
@@ -188,7 +194,7 @@ function gameOver() {
             document.getElementById('yourImg').src = window.localStorage.getItem('image')
             document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
             document.getElementById('yourName').innerHTML = ' ' + result.data.yourRank[0].phone.slice(-4)
-            document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์ลงท้าย</span>${result.data.phone.slice(-4)}`
+            document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span>${result.data.phone.slice(-4)}`
             document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
           } else {
             document.getElementById('sub-leaderboard').style.height = '50%'
@@ -242,7 +248,7 @@ function submit(e) {
       thankImg.src = window.localStorage.getItem('image')
       thankRank.innerHTML = res.data.rank
       thankName.innerHTML = res.data.name
-      thankPhone.innerHTML = `<span class="text-sm">เบอร์ลงท้าย</span>${res.data.phone.slice(-4)}`
+      thankPhone.innerHTML = `<span class="text-sm">เบอร์</span>${res.data.phone.slice(-4)}`
       thankScore.innerHTML = res.data.score
       result.style.display = 'none'
       thankyou.style.display = 'block'
@@ -275,7 +281,7 @@ async function updateFootballPosition() {
       football_2.style.width = 50 + percen_2 + 'px'
       football_2.style.height = 50 + percen_2 + 'px'
       football_2.style.display = 'block';
-      ball2.style.rotate = percen_2 * 1.70 + 'deg'
+      ball2.style.rotate = percen_2 * 2 + 'deg'
     }
     footballX_2 += dx_2 * (hardLevel)// Update X position
     footballY_2 += dy_2 * (hardLevel)// Update Y position
@@ -302,7 +308,7 @@ async function updateFootballPosition() {
       football.style.width = 50 + percen + 'px'
       football.style.height = 50 + percen + 'px'
       football.style.display = 'block';
-      ball1.style.rotate = percen * 1.70 + 'deg'
+      ball1.style.rotate = percen * 2 + 'deg'
     }
     footballX += dx * (hardLevel)// Update X position
     footballY += dy * (hardLevel)// Update Y position
@@ -459,6 +465,7 @@ const setTimer = () => {
 }
 const startGame = () => {
   score = 0
+  document.getElementById('score-sum').textContent = 0
   document.getElementById('score-value').textContent = 0
   document.getElementById('start-containner').style.display = 'none'
   document.getElementById('thankyou-containner').style.display = 'none'

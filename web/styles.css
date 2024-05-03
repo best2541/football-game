@@ -466,10 +466,12 @@ h1 {
   animation: increaseSize 1s infinite;
   /* Apply animation */
 }
+
 @keyframes moveHand {
   0% {
     width: 150%;
   }
+
   100% {
     width: 180%;
   }
@@ -575,7 +577,7 @@ h1 {
 }
 
 .text-sm {
-  font-size: x-small !important;
+  font-size: xx-small !important;
 }
 
 .modal-content {
