@@ -19,7 +19,7 @@ module.exports = {
             })
     },
     getstart: (req, res, next) => {
-        db.query(`select profile.uid , profile.phone , profile.name , profile.score , hard_setting.* from profile CROSS JOIN hard_setting where profile.uid = '12345'`
+        db.query(`select profile.uid , profile.phone , profile.name , profile.score , hard_setting.time_limit_level from profile CROSS JOIN hard_setting where profile.uid = '${req.query.uid}'`
             , (err, result) => {
                 if (err) res.status(400).send({ err: err.message })
                 req.datas.user = result

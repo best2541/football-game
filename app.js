@@ -31,6 +31,7 @@ const db = mysql.createConnection({
 global.db = db
 app.use('/game', require('./routes/game.js'))
 app.use('/dashboard', require('./routes/dashboard.js'))
+app.use('/setting', require('./routes/setting.js'))
 
 app.get('/test', (req, res) => {
     res.send('test : ok')
@@ -72,7 +73,8 @@ app.get('/schema', (req, res) => {
         .catch(err => console.log('play_record skip'))
 
     knex.schema.createTable('hard_setting', (table) => {
-        table.float('level').primary()
+        table.float('level').primary(),
+            table.integer('time_limit_level').defaultTo(4)
     })
         .then(() => {
             console.log('hard_setting created')

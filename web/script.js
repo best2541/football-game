@@ -79,7 +79,7 @@ function getStart() {
         if (result.data.user[0].phone)
           window.localStorage.setItem('phone', result.data.user[0].phone)
 
-        defaultHardLevel = result.data.user[0].level
+        timeLimitLevel = result.data.user[0].time_limit_level
       }
     }).catch(() => {
       const start = document.getElementById('start-containner')
@@ -427,7 +427,8 @@ const setTimer = () => {
   const countTimer = setInterval(() => {
     timer++
     const leftTime = limitTimer - timer
-    document.getElementById('time').innerHTML = `${(leftTime / 60).toFixed(0)}:${(leftTime % 60) > 9 ? '' : '0'}${leftTime % 60}`
+    const minute = leftTime / 60
+    document.getElementById('time').innerHTML = `${(minute >= 1 ? minute - 1 : 0).toFixed(0)}:${(leftTime % 60) > 9 ? '' : '0'}${leftTime % 60}`
     if (timer == limitTimer) {
       gameOver()
       clearInterval(countTimer)
