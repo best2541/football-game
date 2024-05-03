@@ -54,9 +54,11 @@ module.exports = {
     getDashboard: async (req, res, next) => {
         try {
             await knex('profile')
-                .count('phone', { as: 'totalUsers' })
+                .count('uid', { as: 'totalUsers' })
+                .count('phone', { as: 'totalUsersPhone' })
                 .then(result => {
                     req.datas.totalUsers = result[0]?.totalUsers
+                    req.datas.totalUsersPhone = result[0]?.totalUsersPhone
                 })
             await knex('play_record')
                 .count('id', { as: 'allTimePlay' })
@@ -71,6 +73,7 @@ module.exports = {
                 })
             next()
         } catch (err) {
+            console.log(err)
             res.status(500).send({ err: err.message })
         }
     },
@@ -79,18 +82,18 @@ module.exports = {
             const search = req.query.search
             db.query(`SELECT name, score, phone,
             @rank := @rank + 1
-            AS rank
+            'rank'
             FROM (
                 SELECT name, phone, score
                 FROM (
                     SELECT name, score, phone
                     FROM profile 
-                    WHERE name LIKE '%${search}%' OR phone LIKE '%${search}%'
+                    WHERE (name LIKE '%${search}%' OR phone LIKE '%${search}%') AND phone IS NOT NULL
                     ORDER BY score DESC 
 					LIMIT 999
-                ) AS a
-            ) AS ranks,
-            (SELECT @rank := 0) AS ordr;`
+                )as a
+            )as ranks,
+            (SELECT @rank := 0)as ordr;`
                 , async (err, result) => {
                     if (err) throw err
                     req.datas.ranking = result
@@ -105,7 +108,7 @@ module.exports = {
             const { search } = req.query
             db.query(`SELECT uid, name, phone, score, update_date,
             @rank := @rank + 1
-            AS rank
+            'rank'
             FROM (
                 SELECT uid, name, phone, score, update_date
                 FROM (
@@ -114,9 +117,9 @@ module.exports = {
                     WHERE name LIKE '%${search || ''}%' OR phone LIKE '%${search || ''}%'
                     ORDER BY score DESC 
 					LIMIT 999
-                ) AS a
-            ) AS ranks,
-            (SELECT @rank := 0) AS ordr;`
+                ) 'a'
+            ) 'ranks',
+            (SELECT @rank := 0) 'ordr';`
                 , async (err, result) => {
                     if (err) throw err
                     req.datas.ranking = result
@@ -133,18 +136,21 @@ module.exports = {
                 .join('profile', 'play_record.uid', '=', 'profile.uid')
                 .where(builder => {
                     builder.where('profile.phone', 'LIKE', `%${search}%`)
-                    if (start && end)
-                        builder.andWhereBetween('play_record.create_date', [new Date(start).toISOString().slice(0, 10), new Date(end).toISOString().slice(0, 10)])
+                    if (start.toString().length > 0 && end.toString().length > 0) {
+                        builder.andWhereBetween('play_record.create_date', [new Date(start).toISOString().slice(0, 10) + ' 00:00:00', new Date(end).toISOString().slice(0, 10 + ' 23:59:59')])
+                    }
                 })
                 .orWhere(builder => {
                     builder.where('profile.name', 'LIKE', `%${search}%`)
-                        .andWhereBetween('play_record.create_date', [new Date(start).toLocaleDateString(), new Date(end).toLocaleDateString()])
+                    if (start.toString().length > 0 && end.toString().length > 0) {
+                        builder.andWhereBetween('play_record.create_date', [new Date(start).toISOString().slice(0, 10) + ' 00:00:00', new Date(end).toISOString().slice(0, 10) + ' 23:59:59'])
+                    }
                 })
                 .orWhere('profile.name', 'LIKE', `%${search}%`)
                 .orderBy('create_date', 'desc')
             if (start && end) {
-                query.andWhere('play_record.create_date', '>', new Date(start).toISOString().slice(0, 10))
-                    .andWhere('play_record.create_date', '<', new Date(end).toISOString().slice(0, 10))
+                query.andWhere('play_record.create_date', '>', new Date(start).toISOString().slice(0, 10) + ' 00:00:00')
+                    .andWhere('play_record.create_date', '<', new Date(end).toISOString().slice(0, 10) + ' 23:59:59')
             }
             query.then(result => {
                 req.datas.ranking = result
@@ -167,13 +173,13 @@ module.exports = {
                 })
             await knex.raw(`select a.name, b.rank, a.score, c.feq from (
                 select name, score from profile where uid = '${id}'
-                ) as a,
+                ) 'a',
                 (
-                select COUNT(uid) as rank from profile where uid = '${id}' AND score >= (select score from profile where uid = '${id}')
-                ) as b,
+                select COUNT(uid)+1 'rank' from profile where phone is not null AND score > (select score from profile where uid = '${id}')
+                ) 'b',
                 (
-                select COUNT(id) as feq from play_record where uid = '${id}'
-                ) as c`)
+                select COUNT(id) 'feq' from play_record where uid = '${id}'
+                ) 'c'`)
                 .then(result => {
                     req.datas.report = result[0][0]
                     next()

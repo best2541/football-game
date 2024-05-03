@@ -21,10 +21,10 @@ let cooldown_2 = 0
 let check = false
 let check_2 = false
 let bonusCheck = false
-let defaultHardLevel = 0.5
+let defaultHardLevel = 1
 let hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
 let isOver = false
-const api = 'http://localhost:3000'
+const api = 'https://central-game.ants.co.th'
 let timeLimitLevel = 4
 let token
 
@@ -48,17 +48,25 @@ if (!(window.location.href).startsWith("file://") && !(window.location.href).sta
     }).then(result => {
       if (result?.data?.id_token) {
         token = result.data.id_token
-        axios.post('https://central-game-api.ants.co.th/game/getuser', {
+        axios.post(`${api}/game/getuser`, {
           token: token
         }).then(result => {
           if (result.data) {
-            window.localStorage.setItem('uid', result.data.aud)
+            window.localStorage.setItem('uid', result.data.sub)
             window.localStorage.setItem('name', result.data.name)
             window.localStorage.setItem('image', result.data.picture)
+            if (result.data.phone) {
+              window.localStorage.setItem('phone', result.data.phone)
+            } else {
+              window.localStorage.removeItem('phone')
+            }
           }
         })
       }
     })
+      .catch(err => {
+        window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004588192&redirect_uri=https://central-game.ants.co.th&state=${new Date().getTime()}&scope=profile%20openid`
+      })
   } else {
     window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004588192&redirect_uri=https://central-game.ants.co.th&state=${new Date().getTime()}&scope=profile%20openid`
   }
@@ -114,6 +122,10 @@ function gameOver() {
               if (data.role == 'you')
                 totalScore = data.score
               if (data.rank == 1) {
+                if (data.role == 'you') {
+                  document.getElementById('first_place-img').src = window.localStorage.getItem('image')
+                  document.getElementById('first_you').style.display = 'block'
+                }
                 document.getElementById('first_place-img').style.display = 'inline-block'
                 document.getElementById('first_place-name').innerHTML = data.name
                 document.getElementById('first_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -122,6 +134,10 @@ function gameOver() {
                 document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 2) {
+                if (data.role == 'you') {
+                  document.getElementById('second_place-img').src = window.localStorage.getItem('image')
+                  document.getElementById('second_you').style.display = 'block'
+                }
                 document.getElementById('second_place-img').style.display = 'inline-block'
                 document.getElementById('second_place-name').innerHTML = data.name
                 document.getElementById('second_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -130,6 +146,10 @@ function gameOver() {
                 document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 3) {
+                if (data.role == 'you') {
+                  document.getElementById('third_place-img').src = window.localStorage.getItem('image')
+                  document.getElementById('third_you').style.display = 'block'
+                }
                 document.getElementById('third_place-img').style.display = 'inline-block'
                 document.getElementById('third_place-name').innerHTML = data.name
                 document.getElementById('third_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -144,17 +164,17 @@ function gameOver() {
                   card.classList.add("blue-border")
                 card.id = data.role
                 const content = `
-                ${data.role == 'you' ? '<img class="you" style="z-index: 1000;" src="./img/you.png">' : ''}
+                ${data.role == 'you' ? `<img class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
                 <div class="d-flex">
                   <div style="width: 10%;">
                   ${data.rank}
                 </div>
                 <div class="name" style="width: 40%;">
-                  <img class="user-img" src="./img/user.png" style="width: 20px;height: auto;">
+                  <img class="user-img" src="${data.role == 'you' && window.localStorage.getItem('image')}" style="width: 20px;height: auto;" onerror="this.src='./img/user.png'">
                   ${data.name}
                 </div>
                 <div class="" style="width: 30%;">
-                  <span class="text-sm">เบอร์ลงท้าย</span>${data.phone.slice(-4)}
+                  <span class="text-sm">เบอร์</span>${data.phone.slice(-4)}
                 </div>
                 <div class="color-red" style="width: 20%;">
                   ${data.score}
@@ -171,9 +191,10 @@ function gameOver() {
             totalScore = result.data.yourRank[0].score
             document.getElementById('sub-leaderboard').style.height = '35%'
             document.getElementById('fix-leaderboard').style.display = 'block'
+            document.getElementById('yourImg').src = window.localStorage.getItem('image')
             document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
             document.getElementById('yourName').innerHTML = ' ' + result.data.yourRank[0].phone.slice(-4)
-            document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์ลงท้าย</span>${result.data.phone.slice(-4)}`
+            document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span>${result.data.phone.slice(-4)}`
             document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
           } else {
             document.getElementById('sub-leaderboard').style.height = '50%'
@@ -220,12 +241,14 @@ function submit(e) {
   const thankName = document.getElementById('thankName')
   const thankPhone = document.getElementById('thankPhone')
   const thankScore = document.getElementById('thankScore')
+  const thankImg = document.getElementById('thankImg')
   e.preventDefault();
   axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString() })
     .then(res => {
+      thankImg.src = window.localStorage.getItem('image')
       thankRank.innerHTML = res.data.rank
       thankName.innerHTML = res.data.name
-      thankPhone.innerHTML = `<span class="text-sm">เบอร์ลงท้าย</span>${res.data.phone.slice(-4)}`
+      thankPhone.innerHTML = `<span class="text-sm">เบอร์</span>${res.data.phone.slice(-4)}`
       thankScore.innerHTML = res.data.score
       result.style.display = 'none'
       thankyou.style.display = 'block'
@@ -239,6 +262,8 @@ function submit(e) {
 
 async function updateFootballPosition() {
   const football = document.getElementById('football')
+  const ball1 = document.getElementById('ball1')
+  const ball2 = document.getElementById('ball2')
   const football_2 = document.getElementById('football_2')
   const bonus = document.getElementById(`bonus${bonusCount}`)
   const bomb = document.getElementById('bomb')
@@ -256,6 +281,7 @@ async function updateFootballPosition() {
       football_2.style.width = 50 + percen_2 + 'px'
       football_2.style.height = 50 + percen_2 + 'px'
       football_2.style.display = 'block';
+      ball2.style.rotate = percen_2 * 2 + 'deg'
     }
     footballX_2 += dx_2 * (hardLevel)// Update X position
     footballY_2 += dy_2 * (hardLevel)// Update Y position
@@ -282,7 +308,7 @@ async function updateFootballPosition() {
       football.style.width = 50 + percen + 'px'
       football.style.height = 50 + percen + 'px'
       football.style.display = 'block';
-      // football.style.rotate = percen * 1.70 + 'deg'
+      ball1.style.rotate = percen * 2 + 'deg'
     }
     footballX += dx * (hardLevel)// Update X position
     footballY += dy * (hardLevel)// Update Y position
@@ -326,7 +352,7 @@ async function updateFootballPosition() {
         bonusCount < 3 ? bonusCount++ : bonusCount = 1
         bonusCheck = false
       }
-      cooldown = 200
+      cooldown = 100
       getRandomNumber()
     }
     if (percen_2 >= 100) {
@@ -346,7 +372,7 @@ document.getElementById('football').addEventListener('mousedown', function () {
   document.getElementById('score-value').textContent = score;
   document.getElementById('score-sum').textContent = score;
   getRandomNumber()
-  cooldown = 200
+  cooldown = 100
   this.style.top = Math.floor(window.innerWidth / 2) + 'px';
   this.style.left = Math.floor(window.innerWidth / 2) + 'px';
   const gotone = document.getElementById('gotone')
@@ -383,7 +409,7 @@ function bonusClick(element) {
   document.getElementById('score-value').textContent = score;
   document.getElementById('score-sum').textContent = score;
   getRandomNumber()
-  cooldown = 200
+  cooldown = 100
   element.style.top = Math.floor(window.innerWidth / 2) + 'px';
   element.style.left = Math.floor(window.innerWidth / 2) + 'px';
   const gotone = document.getElementById('gottwo')
@@ -440,6 +466,7 @@ const setTimer = () => {
 }
 const startGame = () => {
   score = 0
+  document.getElementById('score-sum').textContent = 0
   document.getElementById('score-value').textContent = 0
   document.getElementById('start-containner').style.display = 'none'
   document.getElementById('thankyou-containner').style.display = 'none'

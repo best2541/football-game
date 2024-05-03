@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken')
 const validate = require('../utilities/validate')
 const DeviceDetector = require('device-detector-js')
 const BotDetector = require('device-detector-js/dist/parsers/bot')
@@ -10,8 +11,24 @@ module.exports = {
         req.data = {}
         next()
     },
+    auth: (req, res, next) => {
+        try {
+            const decodedToken = jwt.decode(req.body.token)
+            db.query(`select phone from profile where uid = '${decodedToken.sub}'`
+                , (err, result) => {
+                    if (err) res.status(400).send({ err: err.message })
+                    if (result.length > 0) {
+                        decodedToken.phone = result[0].phone
+                    }
+                    res.send(decodedToken)
+                }
+            )
+        } catch (err) {
+            res.status(500).send({ err: err.message })
+        }
+    },
     getServerStatus: (req, res, next) => {
-        db.query(`select server_status.status as server_status from server_status`
+        db.query(`select server_status.status 'server_status' from server_status`
             , (err, result) => {
                 if (err) res.status(400).send({ err: err.message })
                 req.datas.server_status = result[0]
@@ -38,11 +55,11 @@ module.exports = {
 
                     const device = deviceDetector.parse(userAgent)?.os?.name
                     db.query(
-                        `insert into play_record (uid,score,device) values (${uid}, ${score},'${device}')`
+                        `insert into play_record (uid,score,device) values ('${uid}', ${score},'${device}')`
                         , (err, result) => {
                             if (err) console.log('err1', err)
                             if (err) throw err
-                            db.query(`insert into profile (uid,score,name) values (${uid},${score},'${name}') on DUPLICATE key update score = score+${score}, update_date = CURRENT_TIMESTAMP()`,
+                            db.query(`insert into profile (uid,score,name) values ('${uid}',${score},'${name}') on DUPLICATE key update score = score+${score}, update_date = CURRENT_TIMESTAMP()`,
                                 (err, result2) => {
                                     if (err) console.log('err2', err)
                                     if (err) throw err
@@ -54,7 +71,7 @@ module.exports = {
                 .catch(() => {
                     validate(req, ['uid', 'phone'])
                         .then(() => {
-                            db.query(`update profile set phone = '${(req.body.phone).toString()}', update_date = CURRENT_TIMESTAMP() where uid = ${req.body.uid}`
+                            db.query(`update profile set phone = '${(req.body.phone).toString()}', update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
                                 , (err, result) => {
                                     if (err) throw err
                                     db.query(`SELECT a.name, a.phone, b.rank, a.score 
@@ -64,9 +81,9 @@ module.exports = {
                                         WHERE uid = '${req.body.uid}'
                                     ) AS a
                                     CROSS JOIN (
-                                        SELECT COUNT(uid) as rank 
+                                        SELECT COUNT(uid) 'rank'
                                         FROM profile 
-                                        WHERE uid = '${req.body.uid}' AND score >= (SELECT score FROM profile WHERE uid = '${req.body.uid}')
+                                        WHERE score >= (SELECT score FROM profile WHERE uid = '${req.body.uid}')
                                     ) AS b;`, (err, result) => {
                                         if (err) throw err
                                         res.send(result[0])
@@ -82,14 +99,14 @@ module.exports = {
     getRanking: (req, res, next) => {
         try {
             const uid = req.query.uid
-            db.query(`SELECT role, name, score, phone, @rank := @rank + 1 AS rank
+            db.query(`SELECT role, name, score, phone, @rank := @rank + 1 'rank'
             FROM (
                 SELECT role, name, score, phone
                 FROM (
-                    SELECT IF(uid = '${uid}', 'you', '') as role, name, score, phone
+                    SELECT IF(uid = '${uid}', 'you', '') 'role', name, score, phone
                     FROM profile 
                     WHERE phone IS NOT NULL
-                    ORDER BY score DESC 
+                    ORDER BY score DESC , update_date ASC
                     LIMIT 999
                 ) AS a
             ) AS ranks,
@@ -100,7 +117,7 @@ module.exports = {
                     req.datas.ranking = result
                     const yourRank = await result.filter(x => x.role == 'you')
                     if (yourRank.length === 0) {
-                        db.query(`select '999+' as role, name, phone, score from profile where uid = '${uid}' and phone is not null`
+                        db.query(`select '999+' 'role', name, phone, score from profile where uid = '${uid}' and phone is not null`
                             , (err, yourResult) => {
                                 if (err) throw err
                                 req.datas.yourRank = yourResult
