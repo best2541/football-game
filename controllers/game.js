@@ -14,7 +14,11 @@ module.exports = {
     auth: (req, res, next) => {
         try {
             const decodedToken = jwt.decode(req.body.token)
-            db.query(`select phone from profile where uid = '${decodedToken.sub}'`
+            db.query(`
+            select a.rank + b.rank + 1 'rank', c.phone FROM
+(select count(phone) as rank from profile where score >(select score from profile where uid ='${decodedToken.sub}')) as a,
+(select count(phone) as rank from profile where score =(select score from profile where uid ='${decodedToken.sub}') and update_date < (select update_date from profile where uid = '${decodedToken.sub}')) as b,
+(select phone from profile where uid = '${decodedToken.sub}') as c`
                 , (err, result) => {
                     if (err) res.status(400).send({ err: err.message })
                     if (result.length > 0) {
