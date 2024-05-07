@@ -354,6 +354,138 @@ async function updateFootballPosition() {
   requestAnimationFrame(updateFootballPosition); // Update position in the next frame
 }
 
+document.getElementById('containner').addEventListener('touchmove', (event) => {
+  event.preventDefault();
+  const hand = document.getElementById('hand-bg')
+
+  const touch = event.touches[0]; // Assuming you're interested in the first touch
+  const x = touch.clientX
+  const y = touch.clientY
+
+  hand.style.left = x + 'px'
+  hand.style.top = y + 'px'
+
+  const football = document.getElementById('football')
+  const left = football.getBoundingClientRect().left
+  const right = football.getBoundingClientRect().right
+  const top = football.getBoundingClientRect().top
+  const bottom = football.getBoundingClientRect().bottom
+
+  const football_2 = document.getElementById('football_2')
+  const left_2 = football_2.getBoundingClientRect().left
+  const right_2 = football_2.getBoundingClientRect().right
+  const top_2 = football_2.getBoundingClientRect().top
+  const bottom_2 = football_2.getBoundingClientRect().bottom
+
+  const bonus1 = document.getElementById('bonus1')
+  const left_bonus1 = bonus1.getBoundingClientRect().left
+  const right_bonus1 = bonus1.getBoundingClientRect().right
+  const top_bonus1 = bonus1.getBoundingClientRect().top
+  const bottom_bonus1 = bonus1.getBoundingClientRect().bottom
+
+  const bonus2 = document.getElementById('bonus2')
+  const left_bonus2 = bonus2.getBoundingClientRect().left
+  const right_bonus2 = bonus2.getBoundingClientRect().right
+  const top_bonus2 = bonus2.getBoundingClientRect().top
+  const bottom_bonus2 = bonus2.getBoundingClientRect().bottom
+
+  const bonus3 = document.getElementById('bonus3')
+  const left_bonus3 = bonus3.getBoundingClientRect().left
+  const right_bonus3 = bonus3.getBoundingClientRect().right
+  const top_bonus3 = bonus3.getBoundingClientRect().top
+  const bottom_bonus3 = bonus3.getBoundingClientRect().bottom
+
+  const bomb = document.getElementById('bomb')
+  const left_bomb = bomb.getBoundingClientRect().left
+  const right_bomb = bomb.getBoundingClientRect().right
+  const top_bomb = bomb.getBoundingClientRect().top
+  const bottom_bomb = bomb.getBoundingClientRect().bottom
+
+  const bomb_2 = document.getElementById('bomb_2')
+  const left_bomb_2 = bomb_2.getBoundingClientRect().left
+  const right_bomb_2 = bomb_2.getBoundingClientRect().right
+  const top_bomb_2 = bomb_2.getBoundingClientRect().top
+  const bottom_bomb_2 = bomb_2.getBoundingClientRect().bottom
+  //football
+  if (x >= left && x <= right && y >= top && y <= bottom) {
+    hand.classList.add('active')
+    score++
+    hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
+    document.getElementById('score-value').textContent = score;
+    document.getElementById('score-sum').textContent = score;
+    getRandomNumber()
+    cooldown = 100
+    football.style.top = Math.floor(window.innerWidth / 2) + 'px';
+    football.style.left = Math.floor(window.innerWidth / 2) + 'px';
+    const gotone = document.getElementById('gotone')
+    const audio = new Audio("gotone.mp3");
+    audio.play()
+    gotone.style.display = 'block'
+    setTimeout(() => {
+      gotone.style.display = 'none'
+    }, 200)
+    setTimeout(function () {
+      hand.classList.remove('active')
+    }, 300)
+  }
+  //football_2
+  if (x >= left_2 && x <= right_2 && y >= top_2 && y <= bottom_2) {
+    hand.classList.add('active')
+    score++
+    hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
+    document.getElementById('score-value').textContent = score;
+    document.getElementById('score-sum').textContent = score;
+    getRandomNumber_2()
+    cooldown_2 = 150
+    football_2.style.top = Math.floor(window.innerWidth / 2) + 'px';
+    football_2.style.left = Math.floor(window.innerWidth / 2) + 'px';
+    const gotone = document.getElementById('gotone')
+    const audio = new Audio("gotone.mp3");
+    audio.play()
+    gotone.style.display = 'block'
+    setTimeout(() => {
+      gotone.style.display = 'none'
+    }, 200)
+    setTimeout(function () {
+      hand.classList.remove('active')
+    }, 300)
+  }
+  //bonus1
+  if (x >= left_bonus1 && x <= right_bonus1 && y >= top_bonus1 && y <= bottom_bonus1) {
+    bonusClick(bonus1)
+    setTimeout(function () {
+      hand.classList.remove('active')
+    }, 300)
+  }
+  //bonus2
+  if (x >= left_bonus2 && x <= right_bonus2 && y >= top_bonus2 && y <= bottom_bonus2) {
+    bonusClick(bonus2)
+    setTimeout(function () {
+      hand.classList.remove('active')
+    }, 300)
+  }
+  //bonus3
+  if (x >= left_bonus3 && x <= right_bonus3 && y >= top_bonus3 && y <= bottom_bonus3) {
+    bonusClick(bonus3)
+    setTimeout(function () {
+      hand.classList.remove('active')
+    }, 300)
+  }
+  //bomb
+  if (x >= left_bomb && x <= right_bomb && y >= top_bomb && y <= bottom_bomb) {
+    bombClick(bomb)
+    setTimeout(function () {
+      hand.classList.remove('active')
+    }, 300)
+  }
+  //bomb_2
+  if (x >= left_bomb_2 && x <= right_bomb_2 && y >= top_bomb_2 && y <= bottom_bomb_2) {
+    bombClick(bomb_2)
+    setTimeout(function () {
+      hand.classList.remove('active')
+    }, 300)
+  }
+})
 document.getElementById('result-form').addEventListener('submit', function (event) {
   submit(event)
 })
@@ -394,6 +526,7 @@ document.getElementById('football_2').addEventListener('mousedown', function () 
 })
 
 function bonusClick(element) {
+  hand.classList.add('active')
   score += 3
   bonusCheck = true
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
@@ -412,6 +545,7 @@ function bonusClick(element) {
   }, 200)
 }
 function bombClick(element) {
+  hand.classList.add('active')
   const audio = new Audio("bomb.mp3");
   audio.play()
   gameOver()
@@ -483,32 +617,32 @@ const audio1 = document.getElementById("background-music");
 function playMusic() {
   audio1.play();
 }
-document.addEventListener("DOMContentLoaded", function () {
-  var container = document.getElementById("containner")
-  var handImage = document.getElementById("hand")
-  container.addEventListener("mousedown", function (event) {
+// document.addEventListener("DOMContentLoaded", function () {
+//   var container = document.getElementById("containner")
+//   var handImage = document.getElementById("hand")
+//   container.addEventListener("mousedown", function (event) {
 
-    // Prevent default click behavior
-    event.preventDefault();
+//     // Prevent default click behavior
+//     event.preventDefault();
 
-    // Calculate click position relative to container
-    var rect = container.getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
+//     // Calculate click position relative to container
+//     var rect = container.getBoundingClientRect();
+//     var x = event.clientX - rect.left;
+//     var y = event.clientY - rect.top;
 
-    // Set hand image position
-    handImage.style.left = x + "px";
-    handImage.style.top = y + "px";
+//     // Set hand image position
+//     handImage.style.left = x + "px";
+//     handImage.style.top = y + "px";
 
-    // Show hand image
-    handImage.classList.remove("hidden");
+//     // Show hand image
+//     handImage.classList.remove("hidden");
 
-    // Hide hand image after 1 second
-    setTimeout(function () {
-      handImage.classList.add("hidden");
-    }, 300);
-  });
-})
+//     // Hide hand image after 1 second
+//     setTimeout(function () {
+//       handImage.classList.add("hidden");
+//     }, 300);
+//   });
+// })
 //ปิดtab
 // window.addEventListener('beforeunload', function (event) {
 //   // Cancel the event

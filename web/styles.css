@@ -97,11 +97,11 @@ h1 {
 
 @keyframes show-hands {
   0% {
-    width: 150px;
+    width: 110%;
   }
 
   100% {
-    width: 100px;
+    width: 80%;
   }
 }
 
@@ -365,12 +365,22 @@ h1 {
 }
 
 .hand-bg {
-  width: 100%;
+  /* width: 100%;
   position: absolute;
   bottom: 0%;
   transform: translate(-50%, 0%);
   left: 50%;
+  animation: moveHand 2s alternate-reverse infinite !important; */
+  width: 80%;
+  position: fixed;
+  bottom: 0%;
+  transform: translate(-50%, -50%);
+  left: 50%;
   /* animation: moveHand 2s alternate-reverse infinite !important; */
+}
+
+.active {
+  animation: show-hands 0.3s linear;
 }
 
 .header {
