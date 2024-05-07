@@ -357,7 +357,7 @@ async function updateFootballPosition() {
 document.getElementById('result-form').addEventListener('submit', function (event) {
   submit(event)
 })
-document.getElementById('football').addEventListener('mouseover', function () {
+document.getElementById('football').addEventListener('mousedown', function () {
   score++
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
@@ -375,7 +375,7 @@ document.getElementById('football').addEventListener('mouseover', function () {
   }, 200)
 })
 
-document.getElementById('football_2').addEventListener('mouseover', function () {
+document.getElementById('football_2').addEventListener('mousedown', function () {
   score++
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
@@ -419,21 +419,21 @@ function bombClick(element) {
   element.style.left = Math.floor(window.innerWidth / 2) + 'px';
 }
 
-document.getElementById('bonus1').addEventListener('mouseover', function () {
+document.getElementById('bonus1').addEventListener('mousedown', function () {
   bonusClick(this)
 })
-document.getElementById('bonus2').addEventListener('mouseover', function () {
+document.getElementById('bonus2').addEventListener('mousedown', function () {
   bonusClick(this)
 })
-document.getElementById('bonus3').addEventListener('mouseover', function () {
+document.getElementById('bonus3').addEventListener('mousedown', function () {
   bonusClick(this)
 })
 
-document.getElementById('bomb').addEventListener('mouseover', function () {
+document.getElementById('bomb').addEventListener('mousedown', function () {
   bombClick(this)
 })
 
-document.getElementById('bomb_2').addEventListener('mouseover', function () {
+document.getElementById('bomb_2').addEventListener('mousedown', function () {
   bombClick(this)
 })
 
