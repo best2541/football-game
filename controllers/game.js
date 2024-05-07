@@ -16,13 +16,14 @@ module.exports = {
             const decodedToken = jwt.decode(req.body.token)
             db.query(`
             select a.rank + b.rank + 1 'rank', c.phone FROM
-(select count(phone) as rank from profile where score >(select score from profile where uid ='${decodedToken.sub}')) as a,
-(select count(phone) as rank from profile where score =(select score from profile where uid ='${decodedToken.sub}') and update_date < (select update_date from profile where uid = '${decodedToken.sub}')) as b,
+(select count(uid) 'rank' from profile where score >(select score from profile where uid ='${decodedToken.sub}') and phone is not null) as a,
+(select count(uid) 'rank' from profile where score =(select score from profile where uid ='${decodedToken.sub}') and update_date < (select update_date from profile where uid = '${decodedToken.sub}') and phone is not null) as b,
 (select phone from profile where uid = '${decodedToken.sub}') as c`
                 , (err, result) => {
                     if (err) res.status(400).send({ err: err.message })
                     if (result.length > 0) {
                         decodedToken.phone = result[0].phone
+                        decodedToken.rank = result[0].rank
                     }
                     res.send(decodedToken)
                 }
@@ -78,7 +79,7 @@ module.exports = {
                             db.query(`update profile set phone = '${(req.body.phone).toString()}', update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
                                 , (err, result) => {
                                     if (err) throw err
-                                    db.query(`SELECT a.name, a.phone, b.rank, a.score 
+                                    db.query(`SELECT a.name, a.phone, b.rank + c.rank 'rank, a.score 
                                     FROM (
                                         SELECT name, phone, score 
                                         FROM profile 
@@ -87,8 +88,13 @@ module.exports = {
                                     CROSS JOIN (
                                         SELECT COUNT(uid) 'rank'
                                         FROM profile 
-                                        WHERE score >= (SELECT score FROM profile WHERE uid = '${req.body.uid}')
-                                    ) AS b;`, (err, result) => {
+                                        WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.uid} and phone is not null')
+                                    ) AS b
+                                    CROSS JOIN (
+                                        select count(uid) 'rank' 
+                                        from profile 
+                                        where score =(select score from profile where uid ='${req.body.uid}') and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null   
+                                    ) AS c)`, (err, result) => {
                                         if (err) throw err
                                         res.send(result[0])
                                     })

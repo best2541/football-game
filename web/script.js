@@ -1,5 +1,6 @@
 // let time = performance.now()
-let score = 0;
+let rank = 999
+let score = 0
 let totalScore = 0
 let footballX = window.innerWidth / 2; // Initial X position
 let footballY = window.innerHeight / 2; // Start at the bottom of the screen
@@ -52,6 +53,7 @@ if (!(window.location.href).startsWith("file://") && !(window.location.href).sta
           token: token
         }).then(result => {
           if (result.data) {
+            rank = result.data?.rank || 999
             window.localStorage.setItem('uid', result.data.sub)
             window.localStorage.setItem('name', result.data.name)
             window.localStorage.setItem('image', result.data.picture)
@@ -273,7 +275,7 @@ async function updateFootballPosition() {
   const percen = timeCounter / (moveUpTime / hardLevel)
   const percen_2 = timeCounter_2 / (moveUpTime / hardLevel)
   if (percen_2 < 100 && cooldown_2 == 0 && !isOver) {
-    if (random_2 > (totalScore > 3000 ? 0.5 : totalScore > 2000 ? 0.6 : totalScore > 1000 ? 0.7 : 0.8)) {
+    if (random_2 > (rank > 31 ? 0.5 : 0.2)) {
       bomb_2.style.width = 50 + (percen_2 + 8) + 'px'
       bomb_2.style.height = 50 + percen_2 + 'px'
       bomb_2.style.display = 'block';
@@ -293,12 +295,12 @@ async function updateFootballPosition() {
     footballY_2 = window.innerHeight / 2 // Reset Y position
   }
   if (percen < 100 && cooldown == 0 && !isOver) {
-    if (random > (totalScore > 3000 ? 0.5 : totalScore > 2000 ? 0.6 : totalScore > 1000 ? 0.7 : 0.8)) {
+    if (random > (rank < 31 ? 0.5 : 0.2)) {
       bomb.style.width = 50 + (percen + 8) + 'px'
       bomb.style.height = 50 + percen + 'px'
       bomb.style.display = 'block';
       // bomb.style.rotate = percen * 1.70 + 'deg'
-    } else if (random > (totalScore > 3000 ? 0.4 : 0.5)) {
+    } else if (random > (rank < 31 ? 0.3 : 0.5)) {
       bonusCheck = true
       bonus.style.width = 50 + percen + 'px'
       bonus.style.height = 'auto'
