@@ -13,7 +13,6 @@ let dx = Math.random() * - 3 // Initial horizontal velocity
 let dy = Math.random() * 4 - 3 // Velocity for moving upwards
 let dx_2 = 0 // Initial horizontal velocity
 let dy_2 = 0 // Velocity for moving upwards
-let direction = 0
 let moveUpTime = 7; // Duration of moving upwards (1 second)
 let timeCounter = 0
 let timeCounter_2 = 0
@@ -24,7 +23,7 @@ let check_2 = false
 let bonusCheck = false
 let defaultHardLevel = 1
 let hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-let isOver = false
+let isOver = true
 const api = 'https://central-game.ants.co.th'
 let timeLimitLevel = 4
 let token
@@ -103,7 +102,7 @@ function getStart() {
 
 function gameOver() {
   isOver = true
-  hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
+  // hardLevel = defaultHardLevel
   document.getElementById('countdown-number').innerHTML = 3
   document.getElementById('countdown-section').style.display = 'block'
   const phone = window.localStorage.getItem('phone')
@@ -215,7 +214,6 @@ function getRandomNumber() {
   var randomNumberY = Math.random() * 4 - 3 // 1 to -3
   random = Math.random()
 
-  direction = Math.random() * 3
   dx = randomNumberX
   dy = randomNumberY
 }
@@ -224,17 +222,6 @@ function getRandomNumber_2() {
   random_2 = Math.random()
   dx_2 = -dx
   dy_2 = -dy
-}
-
-function increaseLevel() {
-  hardLevel++
-  const level = document.getElementById('level')
-  level.value = hardLevel
-}
-function decreaseLevel() {
-  hardLevel--
-  const level = document.getElementById('level')
-  level.value = hardLevel
 }
 
 function submit(e) {
@@ -370,7 +357,7 @@ async function updateFootballPosition() {
 document.getElementById('result-form').addEventListener('submit', function (event) {
   submit(event)
 })
-document.getElementById('football').addEventListener('mousedown', function () {
+document.getElementById('football').addEventListener('mouseover', function () {
   score++
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
@@ -388,7 +375,7 @@ document.getElementById('football').addEventListener('mousedown', function () {
   }, 200)
 })
 
-document.getElementById('football_2').addEventListener('mousedown', function () {
+document.getElementById('football_2').addEventListener('mouseover', function () {
   score++
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
@@ -432,21 +419,21 @@ function bombClick(element) {
   element.style.left = Math.floor(window.innerWidth / 2) + 'px';
 }
 
-document.getElementById('bonus1').addEventListener('mousedown', function () {
+document.getElementById('bonus1').addEventListener('mouseover', function () {
   bonusClick(this)
 })
-document.getElementById('bonus2').addEventListener('mousedown', function () {
+document.getElementById('bonus2').addEventListener('mouseover', function () {
   bonusClick(this)
 })
-document.getElementById('bonus3').addEventListener('mousedown', function () {
+document.getElementById('bonus3').addEventListener('mouseover', function () {
   bonusClick(this)
 })
 
-document.getElementById('bomb').addEventListener('mousedown', function () {
+document.getElementById('bomb').addEventListener('mouseover', function () {
   bombClick(this)
 })
 
-document.getElementById('bomb_2').addEventListener('mousedown', function () {
+document.getElementById('bomb_2').addEventListener('mouseover', function () {
   bombClick(this)
 })
 
@@ -477,7 +464,6 @@ const startGame = () => {
   document.getElementById('result-containner').style.display = 'none'
   document.getElementById('containner').style.display = 'block'
   let countdownValue = 3
-  score = 0
   const myCountdown = setInterval(() => {
     document.getElementById('countdown-section').style.display = 'none'
     document.getElementById('countdown-section').style.display = 'block'
@@ -488,10 +474,11 @@ const startGame = () => {
       document.getElementById('countdown-section').style.display = 'none'
       setTimer()
       isOver = false
-      updateFootballPosition()
+      // updateFootballPosition()
     }
   }, 1000)
 }
+updateFootballPosition()
 const audio1 = document.getElementById("background-music");
 function playMusic() {
   audio1.play();

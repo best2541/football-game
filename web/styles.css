@@ -370,7 +370,7 @@ h1 {
   bottom: 0%;
   transform: translate(-50%, 0%);
   left: 50%;
-  animation: moveHand 2s alternate-reverse infinite !important;
+  /* animation: moveHand 2s alternate-reverse infinite !important; */
 }
 
 .header {
@@ -464,7 +464,6 @@ h1 {
 
 .countdown-number {
   animation: increaseSize 1s infinite;
-  /* Apply animation */
 }
 
 @keyframes moveHand {
