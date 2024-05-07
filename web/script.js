@@ -88,8 +88,10 @@ function getStart() {
         totalScore = result.data.user[0].score
         if (result.data.user[0].phone)
           window.localStorage.setItem('phone', result.data.user[0].phone)
-
-        timeLimitLevel = result.data.user[0].time_limit_level
+      }
+      if (result?.data?.setting.length > 0) {
+        defaultHardLevel = result.data.level[0].level
+        timeLimitLevel = result.data.setting[0].time_limit_level
       }
     }).catch(() => {
       const start = document.getElementById('start-containner')
@@ -101,7 +103,7 @@ function getStart() {
 
 function gameOver() {
   isOver = true
-  hardLevel = defaultHardLevel
+  hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('countdown-number').innerHTML = 3
   document.getElementById('countdown-section').style.display = 'block'
   const phone = window.localStorage.getItem('phone')
