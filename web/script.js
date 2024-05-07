@@ -89,9 +89,9 @@ function getStart() {
         if (result.data.user[0].phone)
           window.localStorage.setItem('phone', result.data.user[0].phone)
       }
-      if (result?.data?.setting.length > 0) {
-        defaultHardLevel = result.data.level[0].level
-        timeLimitLevel = result.data.setting[0].time_limit_level
+      if (result?.data?.setting) {
+        defaultHardLevel = result.data.setting.level
+        timeLimitLevel = result.data.setting.time_limit_level
       }
     }).catch(() => {
       const start = document.getElementById('start-containner')
