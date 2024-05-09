@@ -573,13 +573,14 @@ document.getElementById('bomb_2').addEventListener('mousedown', function () {
 
 const setTimer = () => {
   console.log('timer start')
+  document.getElementById('time').innerHTML = `${Math.floor(timeLimitLevel / 2)}:${timeLimitLevel % 2 == 0 ? '00' : '30'}`
   let timer = 0
   const limitTimer = 30 * timeLimitLevel
   const countTimer = setInterval(() => {
     timer++
     const leftTime = limitTimer - timer
-    const minute = leftTime / 60
-    document.getElementById('time').innerHTML = `${(minute >= 1 ? minute - 1 : 0).toFixed(0)}:${(leftTime % 60) > 9 ? '' : '0'}${leftTime % 60}`
+    const minute = Math.floor(leftTime / 60)
+    document.getElementById('time').innerHTML = `${minute}:${(leftTime % 60) > 9 ? '' : '0'}${leftTime % 60}`
     if (timer == limitTimer) {
       gameOver()
       clearInterval(countTimer)
