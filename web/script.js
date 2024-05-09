@@ -105,7 +105,7 @@ function getStart() {
 
 function gameOver() {
   isOver = true
-  document.getElementById('time').innerHTML = '0:00'
+  console.log('over')
   // hardLevel = defaultHardLevel
   document.getElementById('countdown-number').innerHTML = 3
   document.getElementById('countdown-section').style.display = 'block'
@@ -464,6 +464,7 @@ const setTimer = () => {
 }
 const startGame = () => {
   score = 0
+  document.getElementById('time').innerHTML = '0:00'
   document.getElementById('score-sum').textContent = 0
   document.getElementById('score-value').textContent = 0
   document.getElementById('start-containner').style.display = 'none'
