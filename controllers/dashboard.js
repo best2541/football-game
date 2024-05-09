@@ -71,6 +71,12 @@ module.exports = {
                 .then(result => {
                     req.datas.playToday = result
                 })
+            await knex('profile')
+                .count('uid', { as: 'usersPhonePlayToday' })
+                .whereRaw('DATE(update_date) = CURRENT_DATE and phone IS NOT NULL')
+                .then(result => {
+                    req.datas.usersPhonePlayToday = result[0].usersPhonePlayToday
+                })
             next()
         } catch (err) {
             console.log(err)

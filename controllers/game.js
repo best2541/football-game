@@ -84,7 +84,7 @@ module.exports = {
                 .catch(() => {
                     validate(req, ['uid', 'phone'])
                         .then(() => {
-                            db.query(`update profile set phone = '${(req.body.phone).toString()}', update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
+                            db.query(`update profile set phone = '${(req.body.phone).toString()}', score = 0, update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
                                 , (err, result) => {
                                     if (err) throw err
                                     db.query(`SELECT a.name, a.phone, b.rank + c.rank 'rank, a.score 

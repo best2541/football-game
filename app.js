@@ -95,49 +95,13 @@ app.get('/schema', (req, res) => {
         .catch(err => console.log('server_status skip'))
     res.send('status : ok')
 })
-app.get('/1', async (req, res) => {
-    db.query(
-        'SELECT uid,score FROM profile',
-        function (err, results, fields) {
-            res.send(results);
-        }
-    )
-})
-app.get('/2', (req, res) => {
-    db.query(
-        'SELECT uid, SUM(score) AS total_score FROM log GROUP BY uid',
-        (err, result) => {
-            res.send(result)
-        }
-    )
-})
-app.post('/save1', (req, res) => {
-    const { uid, score } = req.body
-    db
-        .query(`insert into log (uid, score) values (${uid}, ${score})`
-            , (err, result) => {
-                if (err) throw err
-                res.send('ok')
-            })
-})
-app.post('/save2', (req, res) => {
-    const { uid, score, name, phone } = req.body
-    db.query(
-        `insert into play_record (uid,score) values (${uid}, ${score})`
-        , (err, result) => {
-            if (err) throw err
-            db.query(`insert into profile (uid,score,name,phone) values (${uid},${score},'${name}',${phone}) on DUPLICATE key update score = score+${score}`,
-                (err, result2) => {
-                    if (err) throw err
-                    res.send('ok')
-                })
-        }
-    )
-})
 
 app.use(express.static("./web"));
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, './web/index.html'));
+})
+app.get('/2',(req,res)=> {
+    res.sendFile(path.join(__dirname, './web/index2.html'))
 })
 app.listen(3000, () => {
     console.log('app is running')
