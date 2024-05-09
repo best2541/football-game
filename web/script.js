@@ -105,6 +105,7 @@ function getStart() {
 
 function gameOver() {
   isOver = true
+  document.getElementById('time').innerHTML = '0:00'
   // hardLevel = defaultHardLevel
   document.getElementById('countdown-number').innerHTML = 3
   document.getElementById('countdown-section').style.display = 'block'
@@ -172,19 +173,19 @@ function gameOver() {
                 const content = `
                 ${data.role == 'you' ? `<img class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
                 <div class="d-flex">
-                  <div style="width: 10%;">
-                  ${data.rank}
-                </div>
-                <div class="name" style="width: 40%;">
-                  <img class="user-img" src="${data.role == 'you' && window.localStorage.getItem('image')}" style="width: 20px;height: auto;" onerror="this.src='./img/user.png'">
-                  ${data.name}
-                </div>
-                <div class="" style="width: 30%;">
-                  <span class="text-sm">เบอร์</span>${data.phone.slice(-4)}
-                </div>
-                <div class="color-red" style="width: 20%;">
-                  ${data.score}
-                </div>
+                  <div style="width: 10%;padding-left: 2px;">
+                    ${data.rank}
+                  </div>
+                  <div class="name" style="width: 40%;">
+                    <img class="user-img" src="${data.role == 'you' && window.localStorage.getItem('image')}" style="width: 20px;height: auto;" onerror="this.src='./img/user.png'">
+                    ${data.name}
+                  </div>
+                  <div class="" style="width: 30%;">
+                    <span class="text-sm">เบอร์</span>${data.phone.slice(-4)}
+                  </div>
+                  <div class="color-red" style="width: 20%;padding-right: 2px;">
+                    ${data.score}
+                  </div>
                 </div>
               `
                 card.innerHTML = content;
