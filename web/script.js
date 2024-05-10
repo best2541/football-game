@@ -74,9 +74,8 @@ if (!(window.location.href).startsWith("file://") && !(window.location.href).sta
 }
 
 //getstart
-getStart()
 function getStart() {
-  axios.get(`${api}/game/getstart`)
+  axios.post(`${api}/game/getstart`)
     .then(result => {
       if (result.data.server_status.server_status != 1)
         throw new Error('server is offline')
@@ -107,9 +106,9 @@ function gameOver() {
   isOver = true
   console.log('over')
   // hardLevel = defaultHardLevel
+  const phone = window.localStorage.getItem('phone')
   document.getElementById('countdown-number').innerHTML = 3
   document.getElementById('countdown-section').style.display = 'block'
-  const phone = window.localStorage.getItem('phone')
   document.getElementById('containner').style.display = 'none'
   document.getElementById('result-containner').style.display = 'block'
   if (phone) {
@@ -118,9 +117,9 @@ function gameOver() {
     document.getElementById('result-form-phone').style.display = 'none'
   }
   check = true
-  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), name: localStorage.getItem('name'), score: score.toString() })
+  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), name: localStorage.getItem('name'), score: phone?.toString()?.length > 0 ? score.toString() : '-999' })
     .then(() => {
-      axios.get(`${api}/game/getranking?uid=${window.localStorage.getItem('uid')}`)
+      axios.post(`${api}/game/getranking?uid=${window.localStorage.getItem('uid')}`)
         .then(async result => {
           if (result.data.ranking.length > 0) {
             const containner = document.getElementById('sub-leaderboard')
@@ -173,17 +172,17 @@ function gameOver() {
                 const content = `
                 ${data.role == 'you' ? `<img class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
                 <div class="d-flex">
-                  <div style="width: 10%;padding-left: 2px;">
+                  <div style="width: 15%;padding-left: 3px;">
                     ${data.rank}
                   </div>
-                  <div class="name" style="width: 40%;">
+                  <div class="name" style="width: 40%;text-align: left;">
                     <img class="user-img" src="${data.role == 'you' && window.localStorage.getItem('image')}" style="width: 20px;height: auto;" onerror="this.src='./img/user.png'">
                     ${data.name}
                   </div>
-                  <div class="" style="width: 30%;">
+                  <div class="" style="width: 25%;">
                     <span class="text-sm">เบอร์</span>${data.phone.slice(-4)}
                   </div>
-                  <div class="color-red" style="width: 20%;padding-right: 2px;">
+                  <div class="color-red" style="width: 20%;padding-right: 3px;">
                     ${data.score}
                   </div>
                 </div>
@@ -238,7 +237,7 @@ function submit(e) {
   const thankScore = document.getElementById('thankScore')
   const thankImg = document.getElementById('thankImg')
   e.preventDefault();
-  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString() })
+  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString(), score: score.toString() })
     .then(res => {
       thankImg.src = window.localStorage.getItem('image')
       thankRank.innerHTML = res.data.rank
@@ -250,7 +249,7 @@ function submit(e) {
       window.localStorage.setItem('phone', phone.value)
       document.getElementById('result-form-phone').style.display = 'block'
     }).catch((err) => {
-      console.log(err)
+      window.localStorage.removeItem('phone')
       alert('การบันทึกไม่สำเร็จ กรุณาลองใหม่ภายหลัง')
     })
 }
@@ -492,6 +491,9 @@ function playMusic() {
   audio1.play();
 }
 document.addEventListener("DOMContentLoaded", function () {
+  if (window.location.origin) {
+    getStart()
+  }
   var container = document.getElementById("containner")
   var handImage = document.getElementById("hand")
   container.addEventListener("mousedown", function (event) {
@@ -529,6 +531,11 @@ document.addEventListener("DOMContentLoaded", function () {
 //       console.log(err)
 //     })
 // });
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  // Mobile device detected
+} else {
+  window.location.href = '/notsupport'
+}
 
 function openModal() {
   $('#exampleModalLong').modal('show')

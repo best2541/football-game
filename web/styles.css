@@ -44,7 +44,7 @@ h1 {
 #gottwo,
 #bomb,
 #bomb_2 {
-  width: 50px;
+  width: 70px;
   height: auto;
   position: fixed;
   top: 50%;
@@ -277,11 +277,11 @@ h1 {
 
 .d-flex>div:first-child {
   width: 20%;
-  text-align: left;
+  text-align: center;
 }
 
 .d-flex>div:last-child {
-  text-align: right;
+  text-align: center;
   width: 40%;
 }
 

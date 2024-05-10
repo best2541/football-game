@@ -29,15 +29,32 @@
         <div class="modal-dialog p-2" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">กติกา</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">กติกาเกม</h5>
                     <button type="button" class="close text-white color-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <h5>
+                        เป้าหมาย:
+                    </h5>
+                    <p>
+                        ทำคะแนนให้ได้มากที่สุด
+                    </p>
+                    <h5>กติกา:</h5>
                     <ul>
-                        <li>สัมผัสหน้าจอเพื่อรับลูกฟุตบอล</li>
-                        <li>ลูกฟุตบอลมี 3 แบบ: ปกติ (1 คะแนน) พิเศษมีโลโก้ (3 คะแนน) ระเบิด (Game Over)</li>
+                        <li>ลูกฟุตบอล 1 ลูก ได้ 1 แต้ม</li>
+                        <li>ฟุตบอลที่มีโลโก้ 3 แบบ 1 ลูก ได้ 3 แต้ม</li>
+                        <li>ระเบิด (Game Over)</li>
+                        <li>หมดเวลา (Game Over)</li>
+                        <li>รับลูกบอลไม่ได้ ไม่ถือว่า (Game Over) แค่ไม่ได้คะแนน เล่นต่อจนครบ 2 นาที</li>
+                    </ul>
+                    <h5>
+                        หมายเหตุ:
+                    </h5>
+                    <ul>
+                        <li>ผู้เล่นแต่ละคนมีเวลา 2 นาทีต่อรอบ</li>
+                        <li>ผู้เล่นที่มีคะแนนสะสมสูงสุดจะเป็นผู้ชนะ</li>
                     </ul>
                 </div>
             </div>
@@ -108,16 +125,16 @@
                 <div class="card-leaderboard blue-border">
                     <img class="you" src="./img/you.png">
                     <div class="d-flex">
-                        <div id="yourRank" style="width: 10%;">
+                        <div id="yourRank" style="width: 15%;padding-left: 3px;">
                         </div>
-                        <div class="name" style="width: 40%;">
+                        <div class="name" style="width: 40%;text-align: left;">
                             <img id="yourImg" class="user-img" src="./img/user.png" style="width: 20px;height: auto;"
                                 onerror="this.src='./img/user.png'">
                             <span id="yourName"></span>
                         </div>
-                        <div id="yourPhone" style="width: 30%;">
+                        <div id="yourPhone" style="width: 25%;">
                         </div>
-                        <div id="yourScore" class="color-red" style="width: 20%;">
+                        <div id="yourScore" class="color-red" style="width: 20%;padding-right: 3px;">
                         </div>
                     </div>
                 </div>
@@ -127,7 +144,7 @@
         <form id="result-form" class="result-form">
             <div style="position: relative;">
                 <img src="./img/Mobile-Fill.png" style="width: 100%;height: 100%;">
-                <input id="phone" class="trans"
+                <input id="phone" class="trans" pattern="0\d{9}" title="Please enter a 10-digit number starting with 0"
                     style="position: absolute;width: 80%;height: 80%;left: 10%;top:20%;background-color: transparent;border: transparent;"
                     required />
             </div>
@@ -156,17 +173,17 @@
                 <div id="thank-card" class="card-leaderboard blue-border">
                     <img class="you" src="./img/you.png">
                     <div class="d-flex">
-                        <div id="thankRank" style="width: 10%;padding-left: 2px;">
+                        <div id="thankRank" style="width: 15%;padding-left: 3px;">
                         </div>
-                        <div class="name" style="width: 40%;">
+                        <div class="name" style="width: 40%;text-align: left;">
                             <img id="thankImg" class="user-img" src="./img/user.png" style="width: 20px;height: auto;"
                                 onerror="this.src='./img/user.png'">
                             <span id="thankName"></span>
                         </div>
-                        <div style="width: 30%;">
+                        <div style="width: 25%;">
                             <span id="thankPhone"></span>
                         </div>
-                        <div id="thankScore" class="color-red" style="width: 20%;padding-right: 2px;">
+                        <div id="thankScore" class="color-red" style="width: 20%;padding-right: 3px;">
                         </div>
                     </div>
                 </div>

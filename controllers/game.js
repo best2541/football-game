@@ -57,37 +57,50 @@ module.exports = {
             })
     },
     save: (req, res, next) => {
+        const { uid, score, name } = req.body
+        const userAgent = req.headers['user-agent']
+        const bot = botDetector.parse(userAgent)
+        if (bot)
+            res.status(402).send({ err: 'bot detected' })
+
+        const device = deviceDetector.parse(userAgent)?.os?.name
         try {
             validate(req, ['uid', 'score', 'name'])
                 .then(() => {
-                    const { uid, score, name } = req.body
-                    const userAgent = req.headers['user-agent']
-                    const bot = botDetector.parse(userAgent)
-                    if (bot)
-                        res.status(402).send({ err: 'bot detected' })
-
-                    const device = deviceDetector.parse(userAgent)?.os?.name
-                    db.query(
-                        `insert into play_record (uid,score,device) values ('${uid}', ${score},'${device}')`
-                        , (err, result) => {
-                            if (err) console.log('err1', err)
-                            if (err) throw err
-                            db.query(`insert into profile (uid,score,name) values ('${uid}',${score},'${name}') on DUPLICATE key update score = score+${score}, update_date = CURRENT_TIMESTAMP()`,
-                                (err, result2) => {
-                                    if (err) console.log('err2', err)
-                                    if (err) throw err
-                                    res.send('ok')
-                                })
-                        }
-                    )
+                    if (score === '-999') {
+                        db.execute(`insert into profile (uid,score,name) values (?,?,?) on DUPLICATE key update score = score+${score}, update_date = CURRENT_TIMESTAMP()`,
+                            [uid.toString(), score.toString(), name]
+                            ,
+                            (err, result2) => {
+                                if (err) console.log('err2', err)
+                                if (err) throw err
+                                res.send('ok')
+                            })
+                    } else {
+                        db.query(
+                            `insert into play_record (uid,score,device) values ('${uid}', ${score},'${device}')`
+                            , (err, result) => {
+                                if (err) console.log('err1', err)
+                                if (err) throw err
+                                db.execute(`insert into profile (uid,score,name) values (?,?,?) on DUPLICATE key update score = score+${score}, update_date = CURRENT_TIMESTAMP()`,
+                                    [uid.toString(), score.toString(), name]
+                                    ,
+                                    (err, result2) => {
+                                        if (err) console.log('err2', err)
+                                        if (err) throw err
+                                        res.send('ok')
+                                    })
+                            }
+                        )
+                    }
                 })
                 .catch(() => {
-                    validate(req, ['uid', 'phone'])
+                    validate(req, ['uid', 'phone', 'score'])
                         .then(() => {
-                            db.query(`update profile set phone = '${(req.body.phone).toString()}', score = 0, update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
+                            db.query(`update profile set phone = '${(req.body.phone).toString()}', score = ${req.body.score}, update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
                                 , (err, result) => {
                                     if (err) throw err
-                                    db.query(`SELECT a.name, a.phone, b.rank + c.rank 'rank, a.score 
+                                    db.query(`SELECT a.name, a.phone, b.rank + c.rank + 1 'rank', a.score 
                                     FROM (
                                         SELECT name, phone, score 
                                         FROM profile 
@@ -96,17 +109,23 @@ module.exports = {
                                     CROSS JOIN (
                                         SELECT COUNT(uid) 'rank'
                                         FROM profile 
-                                        WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.uid} and phone is not null')
+                                        WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.uid}') and phone is not null
                                     ) AS b
                                     CROSS JOIN (
                                         select count(uid) 'rank' 
                                         from profile 
-                                        where score =(select score from profile where uid ='${req.body.uid}') and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null   
-                                    ) AS c)`, (err, result) => {
+                                        where score =(select score from profile where uid ='${req.body.uid}' and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null)
+                                    ) AS c`, (err, result) => {
                                         if (err) throw err
                                         res.send(result[0])
                                     })
                                 })
+                            db.query(
+                                `insert into play_record (uid,score,device) values ('${uid}', ${score},'${device}')`
+                                , (err, result) => {
+                                    if (err) throw err
+                                }
+                            )
                         })
                         .catch(err2 => res.status(400).send({ err: err2.message }))
                 })

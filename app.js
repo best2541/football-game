@@ -8,8 +8,18 @@ const encrypt = require('./utilities/encrypt')
 
 app.use(express.json())
 app.use(express.urlencoded())
-app.use(cors())
-
+const whitelist = ['https://central-game.ants.co.th', 'https://central-game-cms.ants.co.th']
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+}
+// app.use(cors(corsOptions))
 const options = {
     client: 'mysql2',
     connection: {
@@ -29,9 +39,9 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 })
 global.db = db
-app.use('/game', require('./routes/game.js'))
-app.use('/dashboard', require('./routes/dashboard.js'))
-app.use('/setting', require('./routes/setting.js'))
+app.use('/game', cors(corsOptions), require('./routes/game.js'))
+app.use('/dashboard', cors(corsOptions), require('./routes/dashboard.js'))
+app.use('/setting', cors(corsOptions), require('./routes/setting.js'))
 
 app.get('/test', (req, res) => {
     res.send('test : ok')
@@ -97,11 +107,14 @@ app.get('/schema', (req, res) => {
 })
 
 app.use(express.static("./web"));
-app.get('/', function (req, res) {
+app.get('/', cors(), function (req, res) {
     res.sendFile(path.join(__dirname, './web/index.html'));
 })
-app.get('/2',(req,res)=> {
+app.get('/2', (req, res) => {
     res.sendFile(path.join(__dirname, './web/index2.html'))
+})
+app.get('/notsupport', (req, res) => {
+    res.send('computer / laptop in not support')
 })
 app.listen(3000, () => {
     console.log('app is running')
