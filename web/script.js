@@ -61,6 +61,9 @@ if (!(window.location.href).startsWith("file://") && !(window.location.href).sta
             } else {
               window.localStorage.removeItem('phone')
             }
+            if (result.data.score) {
+              totalScore = result.data.score
+            }
           }
         })
       }
@@ -83,7 +86,6 @@ function getStart() {
         window.localStorage.setItem('uid', result.data.user[0].uid)
         window.localStorage.setItem('name', result.data.user[0].name)
         window.localStorage.setItem('image', result.data.user[0].picture)
-        totalScore = result.data.user[0].score
         if (result.data.user[0].phone)
           window.localStorage.setItem('phone', result.data.user[0].phone)
       }
@@ -267,7 +269,7 @@ async function updateFootballPosition() {
   const percen = timeCounter / (moveUpTime / hardLevel)
   const percen_2 = timeCounter_2 / (moveUpTime / hardLevel)
   if (percen_2 < 100 && cooldown_2 == 0 && !isOver) {
-    if (random_2 > (rank > 31 ? 0.5 : 0.2)) {
+    if (random_2 >= ((rank < 31 && totalScore > 999) ? 0.5 : 0.8)) {
       bomb_2.style.width = 50 + (percen_2 + 8) + 'px'
       bomb_2.style.height = 50 + percen_2 + 'px'
       bomb_2.style.display = 'block';
@@ -287,12 +289,12 @@ async function updateFootballPosition() {
     footballY_2 = window.innerHeight / 2 // Reset Y position
   }
   if (percen < 100 && cooldown == 0 && !isOver) {
-    if (random > (rank < 31 ? 0.5 : 0.2)) {
+    if (random >= ((rank < 31 && totalScore > 999) ? 0.5 : 0.8)) {
       bomb.style.width = 50 + (percen + 8) + 'px'
       bomb.style.height = 50 + percen + 'px'
       bomb.style.display = 'block';
       // bomb.style.rotate = percen * 1.70 + 'deg'
-    } else if (random > (rank < 31 ? 0.3 : 0.5)) {
+    } else if (random >= ((rank < 31 && totalScore > 999) ? 0.3 : 0.5)) {
       bonusCheck = true
       bonus.style.width = 50 + percen + 'px'
       bonus.style.height = 'auto'
@@ -534,10 +536,9 @@ document.addEventListener("DOMContentLoaded", function () {
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
   // Mobile device detected
 } else {
-  window.location.href = '/notsupport'
+  // window.location.href = '/notsupport'
 }
 
 function openModal() {
   $('#exampleModalLong').modal('show')
 }
-$('#exampleModalLong').modal('show')

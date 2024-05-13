@@ -15,15 +15,17 @@ module.exports = {
         try {
             const decodedToken = jwt.decode(req.body.token)
             db.query(`
-            select a.rank + b.rank + 1 'rank', c.phone FROM
+            select a.rank + b.rank + 1 'rank', c.phone , c.score FROM
 (select count(uid) 'rank' from profile where score >(select score from profile where uid ='${decodedToken.sub}') and phone is not null) as a,
 (select count(uid) 'rank' from profile where score =(select score from profile where uid ='${decodedToken.sub}') and update_date < (select update_date from profile where uid = '${decodedToken.sub}') and phone is not null) as b,
-(select phone from profile where uid = '${decodedToken.sub}') as c`
+(select phone, profile.score from profile where uid = '${decodedToken.sub}') as c`
                 , (err, result) => {
                     if (err) res.status(400).send({ err: err.message })
                     if (result.length > 0) {
+                        console.log('test!!!!!!!!!!!!!!!!')
                         decodedToken.phone = result[0].phone
                         decodedToken.rank = result[0].rank
+                        decodedToken.score = result[0].score
                     }
                     res.send(decodedToken)
                 }

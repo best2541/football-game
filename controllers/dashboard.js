@@ -67,13 +67,13 @@ module.exports = {
                 })
             await knex('play_record')
                 .select('uid', 'create_date')
-                .whereRaw('DATE(create_date) = CURRENT_DATE')
+                .whereRaw('DATE(DATE_ADD(create_date, INTERVAL 11 HOUR)) = CURDATE()')
                 .then(result => {
                     req.datas.playToday = result
                 })
             await knex('profile')
                 .count('uid', { as: 'usersPhonePlayToday' })
-                .whereRaw('DATE(update_date) = CURRENT_DATE and phone IS NOT NULL')
+                .whereRaw('DATE(DATE_ADD(update_date, INTERVAL 11 HOUR)) = CURDATE() and phone IS NOT NULL')
                 .then(result => {
                     req.datas.usersPhonePlayToday = result[0].usersPhonePlayToday
                 })
@@ -143,20 +143,26 @@ module.exports = {
                 .where(builder => {
                     builder.where('profile.phone', 'LIKE', `%${search}%`)
                     if (start.toString().length > 0 && end.toString().length > 0) {
-                        builder.andWhereBetween('play_record.create_date', [new Date(start).toISOString().slice(0, 10) + ' 00:00:00', new Date(end).toISOString().slice(0, 10 + ' 23:59:59')])
+                        let start2 = new Date(start)
+                        start2.setDate(start2.getDate() - 1)
+                        builder.andWhereBetween('play_record.create_date', [new Date(start2).toISOString().slice(0, 10) + ' 11:00:00', new Date(end).toISOString().slice(0, 10 + ' 12:59:59')])
                     }
                 })
                 .orWhere(builder => {
                     builder.where('profile.name', 'LIKE', `%${search}%`)
                     if (start.toString().length > 0 && end.toString().length > 0) {
-                        builder.andWhereBetween('play_record.create_date', [new Date(start).toISOString().slice(0, 10) + ' 00:00:00', new Date(end).toISOString().slice(0, 10) + ' 23:59:59'])
+                        let start2 = new Date(start)
+                        start2.setDate(start2.getDate() - 1)
+                        builder.andWhereBetween('play_record.create_date', [new Date(start2).toISOString().slice(0, 10) + ' 11:00:00', new Date(end).toISOString().slice(0, 10) + ' 12:59:59'])
                     }
                 })
                 .orWhere('profile.name', 'LIKE', `%${search}%`)
                 .orderBy('create_date', 'desc')
             if (start && end) {
-                query.andWhere('play_record.create_date', '>', new Date(start).toISOString().slice(0, 10) + ' 00:00:00')
-                    .andWhere('play_record.create_date', '<', new Date(end).toISOString().slice(0, 10) + ' 23:59:59')
+                let start2 = new Date(start)
+                start2.setDate(start2.getDate() - 1)
+                query.andWhere('play_record.create_date', '>', new Date(start2).toISOString().slice(0, 10) + ' 11:00:00')
+                    .andWhere('play_record.create_date', '<', new Date(end).toISOString().slice(0, 10) + ' 12:59:59')
             }
             query.then(result => {
                 req.datas.ranking = result
