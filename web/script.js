@@ -1,6 +1,6 @@
 // let time = performance.now()
 let rank = 999
-let score = 0
+let fj = 0
 let totalScore = 0
 let footballX = window.innerWidth / 2; // Initial X position
 let footballY = window.innerHeight / 2; // Start at the bottom of the screen
@@ -22,7 +22,7 @@ let check = false
 let check_2 = false
 let bonusCheck = false
 let defaultHardLevel = 1
-let hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
+let hardLevel = (Math.floor(fj / 5) * 0.2) + defaultHardLevel
 let isOver = true
 const api = 'https://central-game.ants.co.th'
 let timeLimitLevel = 4
@@ -92,7 +92,7 @@ function getStart() {
       if (result?.data?.setting) {
         defaultHardLevel = result.data.setting.level
         timeLimitLevel = result.data.setting.time_limit_level
-        hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
+        hardLevel = (Math.floor(fj / 5) * 0.2) + defaultHardLevel
         getRandomNumber()
         getRandomNumber_2()
       }
@@ -119,7 +119,7 @@ function gameOver() {
     document.getElementById('result-form-phone').style.display = 'none'
   }
   check = true
-  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), name: localStorage.getItem('name'), score: phone?.toString()?.length > 0 ? score.toString() : '-999' })
+  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), name: localStorage.getItem('name'), token: phone?.toString()?.length > 0 ? btoa(fj.toString()) : btoa('-999') })
     .then(() => {
       axios.post(`${api}/game/getranking?uid=${window.localStorage.getItem('uid')}`)
         .then(async result => {
@@ -239,7 +239,7 @@ function submit(e) {
   const thankScore = document.getElementById('thankScore')
   const thankImg = document.getElementById('thankImg')
   e.preventDefault();
-  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString(), score: score.toString() })
+  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString(), token: btoa(fj.toString()) })
     .then(res => {
       thankImg.src = window.localStorage.getItem('image')
       thankRank.innerHTML = res.data.rank
@@ -363,10 +363,10 @@ document.getElementById('result-form').addEventListener('submit', function (even
   submit(event)
 })
 document.getElementById('football').addEventListener('mousedown', function () {
-  score++
-  hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-  document.getElementById('score-value').textContent = score;
-  document.getElementById('score-sum').textContent = score;
+  fj++
+  hardLevel = (Math.floor(fj / 5) * 0.2) + defaultHardLevel
+  document.getElementById('score-value').textContent = fj;
+  document.getElementById('score-sum').textContent = fj;
   getRandomNumber()
   cooldown = 100
   this.style.top = Math.floor(window.innerWidth / 2) + 'px';
@@ -381,10 +381,10 @@ document.getElementById('football').addEventListener('mousedown', function () {
 })
 
 document.getElementById('football_2').addEventListener('mousedown', function () {
-  score++
-  hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-  document.getElementById('score-value').textContent = score;
-  document.getElementById('score-sum').textContent = score;
+  fj++
+  hardLevel = (Math.floor(fj / 5) * 0.2) + defaultHardLevel
+  document.getElementById('score-value').textContent = fj;
+  document.getElementById('score-sum').textContent = fj;
   getRandomNumber_2()
   cooldown_2 = 150
   this.style.top = Math.floor(window.innerWidth / 2) + 'px';
@@ -400,11 +400,11 @@ document.getElementById('football_2').addEventListener('mousedown', function () 
 
 function bonusClick(element) {
   hand.classList.add('active')
-  score += 3
+  fj += 3
   bonusCheck = true
-  hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-  document.getElementById('score-value').textContent = score;
-  document.getElementById('score-sum').textContent = score;
+  hardLevel = (Math.floor(fj / 5) * 0.2) + defaultHardLevel
+  document.getElementById('score-value').textContent = fj;
+  document.getElementById('score-sum').textContent = fj;
   getRandomNumber()
   cooldown = 100
   element.style.top = Math.floor(window.innerWidth / 2) + 'px';
@@ -464,7 +464,7 @@ const setTimer = () => {
   }, 1000)
 }
 const startGame = () => {
-  score = 0
+  fj = 0
   document.getElementById('time').innerHTML = '0:00'
   document.getElementById('score-sum').textContent = 0
   document.getElementById('score-value').textContent = 0
@@ -521,6 +521,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 300);
   });
 })
+
 //ปิดtab
 // window.addEventListener('beforeunload', function (event) {
 //   // Cancel the event

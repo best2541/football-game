@@ -59,7 +59,8 @@ module.exports = {
             })
     },
     save: (req, res, next) => {
-        const { uid, score, name } = req.body
+        const { uid, token, name } = req.body
+        req.body.score = atob(token)
         const userAgent = req.headers['user-agent']
         const bot = botDetector.parse(userAgent)
         if (bot)
@@ -67,7 +68,7 @@ module.exports = {
 
         const device = deviceDetector.parse(userAgent)?.os?.name
         try {
-            validate(req, ['uid', 'score', 'name'])
+            validate(req, ['uid', 'name', 'token'])
                 .then(() => {
                     if (score === '-999') {
                         db.execute(`insert into profile (uid,score,name) values (?,?,?) on DUPLICATE key update score = score+${score}, update_date = CURRENT_TIMESTAMP()`,
@@ -97,7 +98,7 @@ module.exports = {
                     }
                 })
                 .catch(() => {
-                    validate(req, ['uid', 'phone', 'score'])
+                    validate(req, ['uid', 'phone', 'token'])
                         .then(() => {
                             db.query(`update profile set phone = '${(req.body.phone).toString()}', score = ${req.body.score}, update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
                                 , (err, result) => {
