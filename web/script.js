@@ -12,10 +12,6 @@ let footballY_2 = window.innerHeight / 2; // Start at the bottom of the screen
 let random = 0
 let random_2 = 0
 let bonusCount = 1
-let dx = Math.random() * - 3 // Initial horizontal velocity
-let dy = Math.random() * 4 - 3 // Velocity for moving upwards
-let dx_2 = 0 // Initial horizontal velocity
-let dy_2 = 0 // Velocity for moving upwards
 let moveUpTime = 7; // Duration of moving upwards (1 second)
 let timeCounter = 0
 let timeCounter_2 = 0
@@ -221,15 +217,11 @@ function getRandomNumber() {
   var randomNumberY = Math.random() * 4 - 3 // 1 to -3
   random = Math.random()
   ind = Math.floor(Math.random() * 16) + 1
-  dx = randomNumberX
-  dy = randomNumberY
 }
 
 function getRandomNumber_2() {
   random_2 = Math.random()
   ind2 = Math.floor(Math.random() * 16) + 1
-  dx_2 = -dx
-  dy_2 = -dy
 }
 
 function submit(e) {
