@@ -2,6 +2,9 @@
 let rank = 999
 let score = 0
 let totalScore = 0
+let ind = 0
+let ind2 = 0
+const pattern = [[window.innerWidth / 1.2, window.innerHeight / 2, -1, 1], [window.innerWidth / 1.2, window.innerHeight / 2, -1, 1], [window.innerWidth / 4, window.innerHeight / 2, 1, -1], [window.innerWidth / 3, window.innerHeight / 1.5, 1, -2], [window.innerWidth / 2, window.innerHeight / 2, -3, 2], [window.innerWidth / 2, window.innerHeight / 2, 3, -1], [window.innerWidth / 2, window.innerHeight / 2, -2, 1], [window.innerWidth / 2, window.innerHeight / 3, -1, 1], [window.innerWidth / 3, window.innerHeight / 3, 1, 1], [window.innerWidth / 2, window.innerHeight / 3, 1, 1], [window.innerWidth / 2, window.innerHeight / 1.5, 0, 2], [window.innerWidth / 2, window.innerHeight / 2, 0, 0], [window.innerWidth / 1.2, window.innerHeight / 1.5, -2, -2], [window.innerWidth / 2, window.innerHeight / 2, 1, -1.5], [window.innerWidth / 4, window.innerHeight / 2, 2, -1], [window.innerWidth / 1.2, window.innerHeight / 3, -1, 1], [window.innerWidth / 3, window.innerHeight / 3, 1, 1]]
 let footballX = window.innerWidth / 2; // Initial X position
 let footballY = window.innerHeight / 2; // Start at the bottom of the screen
 let footballX_2 = window.innerWidth / 2; // Initial X position
@@ -214,17 +217,17 @@ function gameOver() {
 }
 
 function getRandomNumber() {
-  const pattern = []
   var randomNumberX = Math.random() * -3 //0 to -3
   var randomNumberY = Math.random() * 4 - 3 // 1 to -3
   random = Math.random()
-
+  ind = Math.floor(Math.random() * 16) + 1
   dx = randomNumberX
   dy = randomNumberY
 }
 
 function getRandomNumber_2() {
   random_2 = Math.random()
+  ind2 = Math.floor(Math.random() * 16) + 1
   dx_2 = -dx
   dy_2 = -dy
 }
@@ -279,14 +282,14 @@ async function updateFootballPosition() {
       football_2.style.display = 'block';
       ball2.style.rotate = percen_2 * 2 + 'deg'
     }
-    footballX_2 += dx_2 * (hardLevel)// Update X position
-    footballY_2 += dy_2 * (hardLevel)// Update Y position
+    footballX_2 += pattern[ind2][2] * (hardLevel)// Update X position
+    footballY_2 += pattern[ind2][3] * (hardLevel)// Update Y position
   } else {
     timeCounter_2 = 0
     football_2.style.display = 'none'
     bomb_2.style.display = 'none';
-    footballX_2 = window.innerWidth / 2 // Reset X position
-    footballY_2 = window.innerHeight / 2 // Reset Y position
+    footballX_2 = pattern[ind2][0] // Reset X position
+    footballY_2 = pattern[ind2][1] // Reset Y position
   }
   if (percen < 100 && cooldown == 0 && !isOver) {
     if (random >= ((rank < 31 && totalScore > 999) ? 0.5 : 0.8)) {
@@ -306,8 +309,8 @@ async function updateFootballPosition() {
       football.style.display = 'block';
       ball1.style.rotate = percen * 2 + 'deg'
     }
-    footballX += dx * (hardLevel)// Update X position
-    footballY += dy * (hardLevel)// Update Y position
+    footballX += pattern[ind][2] * (hardLevel)// Update X position
+    footballY += pattern[ind][3] * (hardLevel)// Update Y position
   } else {
     timeCounter = 0
     football.style.display = 'none';
@@ -319,8 +322,8 @@ async function updateFootballPosition() {
     bomb.style.display = 'none';
     bomb.style.width = 50 + 'px'
     bomb.style.height = 50 + 'px'
-    footballX = window.innerWidth / 2 // Reset X position
-    footballY = window.innerHeight / 2 // Reset Y position
+    footballX = pattern[ind][0] // Reset X position
+    footballY = pattern[ind][1] // Reset Y position
     if (bonusCheck) {
       bonusCount < 3 ? bonusCount++ : bonusCount = 1
       bonusCheck = false
@@ -369,8 +372,6 @@ document.getElementById('football').addEventListener('mousedown', function () {
   document.getElementById('score-sum').textContent = score;
   getRandomNumber()
   cooldown = 100
-  this.style.top = Math.floor(window.innerWidth / 2) + 'px';
-  this.style.left = Math.floor(window.innerWidth / 2) + 'px';
   const gotone = document.getElementById('gotone')
   const audio = new Audio("gotone.mp3");
   audio.play()
@@ -387,8 +388,6 @@ document.getElementById('football_2').addEventListener('mousedown', function () 
   document.getElementById('score-sum').textContent = score;
   getRandomNumber_2()
   cooldown_2 = 150
-  this.style.top = Math.floor(window.innerWidth / 2) + 'px';
-  this.style.left = Math.floor(window.innerWidth / 2) + 'px';
   const gotone = document.getElementById('gotone')
   const audio = new Audio("gotone.mp3");
   audio.play()
@@ -407,8 +406,6 @@ function bonusClick(element) {
   document.getElementById('score-sum').textContent = score;
   getRandomNumber()
   cooldown = 100
-  element.style.top = Math.floor(window.innerWidth / 2) + 'px';
-  element.style.left = Math.floor(window.innerWidth / 2) + 'px';
   const gotone = document.getElementById('gottwo')
   const audio = new Audio("gottwo.mp3");
   audio.play()
@@ -422,8 +419,6 @@ function bombClick(element) {
   const audio = new Audio("bomb.mp3");
   audio.play()
   gameOver()
-  element.style.top = Math.floor(window.innerWidth / 2) + 'px';
-  element.style.left = Math.floor(window.innerWidth / 2) + 'px';
 }
 
 document.getElementById('bonus1').addEventListener('mousedown', function () {
