@@ -106,7 +106,6 @@ function getStart() {
 
 function gameOver() {
   isOver = true
-  console.log('over')
   // hardLevel = defaultHardLevel
   const phone = window.localStorage.getItem('phone')
   document.getElementById('countdown-number').innerHTML = 3
@@ -215,6 +214,7 @@ function gameOver() {
 }
 
 function getRandomNumber() {
+  const pattern = []
   var randomNumberX = Math.random() * -3 //0 to -3
   var randomNumberY = Math.random() * 4 - 3 // 1 to -3
   random = Math.random()
@@ -496,30 +496,30 @@ document.addEventListener("DOMContentLoaded", function () {
   if (window.location.origin) {
     getStart()
   }
-  var container = document.getElementById("containner")
-  var handImage = document.getElementById("hand")
-  container.addEventListener("mousedown", function (event) {
+  // var container = document.getElementById("containner")
+  // var handImage = document.getElementById("hand")
+  // container.addEventListener("mousedown", function (event) {
 
-    // Prevent default click behavior
-    event.preventDefault();
+  //   // Prevent default click behavior
+  //   event.preventDefault();
 
-    // Calculate click position relative to container
-    var rect = container.getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
+  //   // Calculate click position relative to container
+  //   var rect = container.getBoundingClientRect();
+  //   var x = event.clientX - rect.left;
+  //   var y = event.clientY - rect.top;
 
-    // Set hand image position
-    handImage.style.left = x + "px";
-    handImage.style.top = y + "px";
+  //   // Set hand image position
+  //   handImage.style.left = x + "px";
+  //   handImage.style.top = y + "px";
 
-    // Show hand image
-    handImage.classList.remove("hidden");
+  //   // Show hand image
+  //   handImage.classList.remove("hidden");
 
-    // Hide hand image after 1 second
-    setTimeout(function () {
-      handImage.classList.add("hidden");
-    }, 300);
-  });
+  //   // Hide hand image after 1 second
+  //   setTimeout(function () {
+  //     handImage.classList.add("hidden");
+  //   }, 300);
+  // });
 })
 //ปิดtab
 // window.addEventListener('beforeunload', function (event) {
@@ -539,6 +539,12 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
   // window.location.href = '/notsupport'
 }
 
+document.addEventListener('dragstart', function (event) {
+  event.preventDefault()
+})
+document.addEventListener('touchstart'), event => {
+  event.preventDefault()
+}
 function openModal() {
   $('#exampleModalLong').modal('show')
 }
