@@ -56,6 +56,11 @@ h1 {
   /* animation: ball-rotation 1s linear infinite !important; */
 }
 
+#gotone,
+#gottwo {
+  animation: fadeOut 500ms linear infinite !important;
+}
+
 .football,
 .bonus,
 .bomb {
@@ -145,8 +150,9 @@ h1 {
 
 #time {
   position: absolute;
+  font-size: large;
   left: 5%;
-  top: 4.9%;
+  top: 4.2%;
   color: white;
 }
 
@@ -226,22 +232,22 @@ h1 {
 
 #first_place {
   position: absolute;
-  top: 23%;
+  top: 28%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 #second_place {
   position: absolute;
-  top: 26%;
-  left: 27.5%;
+  top: 30%;
+  left: 24%;
   transform: translate(-50%, -50%);
 }
 
 #third_place {
   position: absolute;
-  top: 29%;
-  left: 73%;
+  top: 34%;
+  left: 77%;
   transform: translate(-50%, -50%);
 }
 
@@ -270,25 +276,40 @@ h1 {
 .d-flex>div {
   height: 100%;
   align-items: center !important;
-  text-align: center;
+  text-align: center !important;
+  align-items: center !important;
+  align-self: center !important;
+  vertical-align: middle !important;
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
 .d-flex>div:first-child {
   width: 20%;
+  height: 120%;
   text-align: center;
+  background-color: #0087e2;
+  border-top-left-radius: 15%;
+  border-bottom-left-radius: 15%;
+  border-top-right-radius: 23px;
+  border-bottom-right-radius: 10px;
+  color: white;
+  font-size: medium;
 }
 
 .d-flex>div:last-child {
+  font-size: large;
   text-align: center;
   width: 40%;
+  font-weight: 900 !important;
+  font-size: large !important;
 }
 
 .name {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  font-size: medium;
 }
 
 .sticky-bottom {
@@ -299,7 +320,7 @@ h1 {
 
 .you {
   position: absolute;
-  left: 98%;
+  left: 80%;
   top: -50%;
   width: 30px;
   height: auto;
@@ -326,7 +347,7 @@ h1 {
   position: absolute;
   display: block;
   margin: auto;
-  width: 55%;
+  width: 50%;
   top: 3%;
 }
 
@@ -335,7 +356,7 @@ h1 {
   display: block;
   margin: auto;
   width: 100%;
-  top: 10%;
+  top: 8%;
 }
 
 .info-img {
@@ -467,6 +488,16 @@ h1 {
   /* Apply animation */
 }
 
+@keyframes fadeOut {
+  0% {
+    opacity: 100%;
+  }
+
+  100% {
+    opacity: 0%;
+  }
+}
+
 @keyframes moveHand {
   0% {
     width: 150%;
@@ -578,6 +609,10 @@ h1 {
 
 .text-sm {
   font-size: xx-small !important;
+}
+
+.text-s {
+  font-size: x-small !important;
 }
 
 .modal-content {

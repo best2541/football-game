@@ -104,6 +104,8 @@ function getStart() {
 }
 
 function gameOver() {
+  const cheer_audio = new Audio("cheer.mp3");
+  cheer_audio.play();
   isOver = true
   // hardLevel = defaultHardLevel
   const phone = window.localStorage.getItem('phone')
@@ -129,10 +131,8 @@ function gameOver() {
                 totalScore = data.score
               if (data.rank == 1) {
                 if (data.role == 'you') {
-                  document.getElementById('first_place-img').src = window.localStorage.getItem('image')
                   document.getElementById('first_you').style.display = 'block'
                 }
-                document.getElementById('first_place-img').style.display = 'inline-block'
                 document.getElementById('first_place-name').innerHTML = data.name
                 document.getElementById('first_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('first_place-score').innerHTML = data.score
@@ -141,10 +141,8 @@ function gameOver() {
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 2) {
                 if (data.role == 'you') {
-                  document.getElementById('second_place-img').src = window.localStorage.getItem('image')
                   document.getElementById('second_you').style.display = 'block'
                 }
-                document.getElementById('second_place-img').style.display = 'inline-block'
                 document.getElementById('second_place-name').innerHTML = data.name
                 document.getElementById('second_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('second_place-score').innerHTML = data.score
@@ -153,10 +151,8 @@ function gameOver() {
                 document.getElementById('thankScore').innerHTML = data.score
               } else if (data.rank == 3) {
                 if (data.role == 'you') {
-                  document.getElementById('third_place-img').src = window.localStorage.getItem('image')
                   document.getElementById('third_you').style.display = 'block'
                 }
-                document.getElementById('third_place-img').style.display = 'inline-block'
                 document.getElementById('third_place-name').innerHTML = data.name
                 document.getElementById('third_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('third_place-score').innerHTML = data.score
@@ -172,17 +168,16 @@ function gameOver() {
                 const content = `
                 ${data.role == 'you' ? `<img class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
                 <div class="d-flex">
-                  <div style="width: 15%;padding-left: 3px;">
+                  <div style="width: 15%;padding-left: 2px;">
                     ${data.rank}
                   </div>
                   <div class="name" style="width: 40%;text-align: left;">
-                    <img class="user-img" src="${data.role == 'you' && window.localStorage.getItem('image')}" style="width: 20px;height: auto;" onerror="this.src='./img/user.png'">
                     ${data.name}
                   </div>
                   <div class="" style="width: 25%;">
-                    <span class="text-sm">เบอร์</span>${data.phone.slice(-4)}
+                    <span class="text-sm">เบอร์</span><span class="text-s">${data.phone.slice(-4)}</span>
                   </div>
-                  <div class="color-red" style="width: 20%;padding-right: 3px;">
+                  <div class="color-red" style="width: 20%;padding-right: 2px;">
                     ${data.score}
                   </div>
                 </div>
@@ -197,10 +192,9 @@ function gameOver() {
             totalScore = result.data.yourRank[0].score
             document.getElementById('sub-leaderboard').style.height = '35%'
             document.getElementById('fix-leaderboard').style.display = 'block'
-            document.getElementById('yourImg').src = window.localStorage.getItem('image')
             document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
             document.getElementById('yourName').innerHTML = ' ' + result.data.yourRank[0].phone.slice(-4)
-            document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span>${result.data.phone.slice(-4)}`
+            document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${result.data.phone.slice(-4)}</span>`
             document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
           } else {
             document.getElementById('sub-leaderboard').style.height = '50%'
@@ -213,8 +207,6 @@ function gameOver() {
 }
 
 function getRandomNumber() {
-  var randomNumberX = Math.random() * -3 //0 to -3
-  var randomNumberY = Math.random() * 4 - 3 // 1 to -3
   random = Math.random()
   ind = Math.floor(Math.random() * 16) + 1
 }
@@ -239,7 +231,7 @@ function submit(e) {
       thankImg.src = window.localStorage.getItem('image')
       thankRank.innerHTML = res.data.rank
       thankName.innerHTML = res.data.name
-      thankPhone.innerHTML = `<span class="text-sm">เบอร์</span>${res.data.phone.slice(-4)}`
+      thankPhone.innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${res.data.phone.slice(-4)}</span>`
       thankScore.innerHTML = res.data.score
       result.style.display = 'none'
       thankyou.style.display = 'block'
@@ -370,7 +362,7 @@ document.getElementById('football').addEventListener('mousedown', function () {
   gotone.style.display = 'block'
   setTimeout(() => {
     gotone.style.display = 'none'
-  }, 200)
+  }, 500)
 })
 
 document.getElementById('football_2').addEventListener('mousedown', function () {
@@ -386,7 +378,7 @@ document.getElementById('football_2').addEventListener('mousedown', function () 
   gotone.style.display = 'block'
   setTimeout(() => {
     gotone.style.display = 'none'
-  }, 200)
+  }, 500)
 })
 
 function bonusClick(element) {
@@ -476,6 +468,7 @@ const startGame = () => {
 }
 updateFootballPosition()
 const audio1 = document.getElementById("background-music");
+audio1.volume = 0.5
 function playMusic() {
   audio1.play();
 }
@@ -523,7 +516,7 @@ document.addEventListener("DOMContentLoaded", function () {
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
   // Mobile device detected
 } else {
-  // window.location.href = '/notsupport'
+  window.location.href = '/notsupport'
 }
 
 document.addEventListener('dragstart', function (event) {
