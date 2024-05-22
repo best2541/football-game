@@ -266,6 +266,13 @@ h1 {
   width: 30%;
 }
 
+.score-d-flex {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
 .d-flex {
   position: relative;
   display: flex;
@@ -392,6 +399,19 @@ h1 {
   transform: translate(-50%, 0%);
   left: 50%;
   animation: moveHand 2s alternate-reverse infinite !important;
+}
+
+.profile-bg {
+  position: relative;
+  height: 90px;
+}
+
+.profile {
+  width: 98%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
 }
 
 .header {

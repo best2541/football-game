@@ -107,7 +107,7 @@ function gameOver() {
   const cheer_audio = new Audio("cheer.mp3");
   cheer_audio.play();
   isOver = true
-  // hardLevel = defaultHardLevel
+  document.getElementById('profile').src = window.localStorage.getItem('image')
   const phone = window.localStorage.getItem('phone')
   document.getElementById('countdown-number').innerHTML = 3
   document.getElementById('countdown-section').style.display = 'block'
@@ -256,7 +256,7 @@ async function updateFootballPosition() {
   const percen = timeCounter / (moveUpTime / hardLevel)
   const percen_2 = timeCounter_2 / (moveUpTime / hardLevel)
   if (percen_2 < 100 && cooldown_2 == 0 && !isOver) {
-    if (random_2 >= ((rank < 31 && totalScore > 999) ? 0.5 : 0.8)) {
+    if (random_2 >= ((totalScore > 1999) ? 0.4 : (totalScore > 800) ? 0.6 : 0.8)) {
       bomb_2.style.width = 50 + (percen_2 + 8) + 'px'
       bomb_2.style.height = 50 + percen_2 + 'px'
       bomb_2.style.display = 'block';
@@ -276,12 +276,12 @@ async function updateFootballPosition() {
     footballY_2 = pattern[ind2][1] // Reset Y position
   }
   if (percen < 100 && cooldown == 0 && !isOver) {
-    if (random >= ((rank < 31 && totalScore > 999) ? 0.5 : 0.8)) {
+    if (random >= ((totalScore > 1999) ? 0.4 : (totalScore > 800) ? 0.6 : 0.8)) {
       bomb.style.width = 50 + (percen + 8) + 'px'
       bomb.style.height = 50 + percen + 'px'
       bomb.style.display = 'block';
       // bomb.style.rotate = percen * 1.70 + 'deg'
-    } else if (random >= ((rank < 31 && totalScore > 999) ? 0.3 : 0.5)) {
+    } else if (random >= ((totalScore > 1999) ? 0.3 : (totalScore > 800) ? 0.4 : 0.5)) {
       bonusCheck = true
       bonus.style.width = 50 + percen + 'px'
       bonus.style.height = 'auto'
