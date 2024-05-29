@@ -102,12 +102,6 @@ h1 {
   align-items: center !important;
 }
 
-#first_place-name,
-#second_place-name,
-#third_place-name {
-  font-size: medium;
-}
-
 @keyframes rotation {
   0% {
     rotate: 0deg;
@@ -473,7 +467,6 @@ h1 {
   top: 46%;
   width: 100%;
   height: 35%;
-  padding-top: 2.5%;
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 999;

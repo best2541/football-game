@@ -122,14 +122,20 @@ module.exports = {
                                         from profile 
                                         where score =(select score from profile where uid ='${req.body.uid}' and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null)
                                     ) AS c`, (err, result) => {
-                                        if (err) throw err
+                                        if (err) {
+                                            console.log('1', err)
+                                            throw err
+                                        }
                                         res.send(result[0])
                                     })
                                 })
                             db.query(
                                 `insert into play_record (uid,score,device) values ('${uid}', ${score},'${device}')`
                                 , (err, result) => {
-                                    if (err) throw err
+                                    if (err) {
+                                        console.log('2', err)
+                                        throw err
+                                    }
                                 }
                             )
                         })
@@ -150,7 +156,6 @@ module.exports = {
                     FROM profile 
                     WHERE phone IS NOT NULL
                     ORDER BY score DESC , update_date ASC
-                    LIMIT 999
                 ) AS a
             ) AS ranks,
             (SELECT @rank := 0) AS ordr;

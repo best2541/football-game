@@ -6,7 +6,7 @@ let score = 0
 let totalScore = 0
 let ind = 0
 let ind2 = 0
-const pattern = [[window.innerWidth / 1.2, window.innerHeight / 2, -1, 1], [window.innerWidth / 1.2, window.innerHeight / 2, -1, 1], [window.innerWidth / 4, window.innerHeight / 2, 1, -1], [window.innerWidth / 3, window.innerHeight / 1.5, 1, -2], [window.innerWidth / 2, window.innerHeight / 2, -3, 2], [window.innerWidth / 2, window.innerHeight / 2, 3, -1], [window.innerWidth / 2, window.innerHeight / 2, -2, 1], [window.innerWidth / 2, window.innerHeight / 3, -1, 1], [window.innerWidth / 3, window.innerHeight / 3, 1, 1], [window.innerWidth / 2, window.innerHeight / 3, 1, 1], [window.innerWidth / 2, window.innerHeight / 1.5, 0, 2], [window.innerWidth / 2, window.innerHeight / 2, 0, 0], [window.innerWidth / 1.2, window.innerHeight / 1.5, -2, -2], [window.innerWidth / 2, window.innerHeight / 2, 1, -1.5], [window.innerWidth / 4, window.innerHeight / 2, 2, -1], [window.innerWidth / 1.2, window.innerHeight / 3, -1, 1], [window.innerWidth / 3, window.innerHeight / 3, 1, 1]]
+const pattern = [[window.innerWidth / 1.2, window.innerHeight / 2, -1, 1], [window.innerWidth / 1.2, window.innerHeight / 2, -1, 1], [window.innerWidth / 4, window.innerHeight / 2, 1, -1], [window.innerWidth / 3, window.innerHeight / 1.5, 1, -0.7], [window.innerWidth / 2, window.innerHeight / 2, -1, 1], [window.innerWidth / 2, window.innerHeight / 2, 2, -1], [window.innerWidth / 2, window.innerHeight / 2, -2, 1], [window.innerWidth / 2, window.innerHeight / 3, -1, 1], [window.innerWidth / 3, window.innerHeight / 3, 1, 1], [window.innerWidth / 2, window.innerHeight / 3, 1.1, 1.2], [window.innerWidth / 2, window.innerHeight / 1.5, 0, -1.8], [window.innerWidth / 2, window.innerHeight / 2, 0, 0], [window.innerWidth / 1.2, window.innerHeight / 1.5, -2, -1.5], [window.innerWidth / 2, window.innerHeight / 2, 1, -1.5], [window.innerWidth / 4, window.innerHeight / 2, 2, -1], [window.innerWidth / 1.2, window.innerHeight / 3, -1, 1], [window.innerWidth / 3, window.innerHeight / 3, 1, 1]]
 let footballX = window.innerWidth / 2; // Initial X position
 let footballY = window.innerHeight / 2; // Start at the bottom of the screen
 let footballX_2 = window.innerWidth / 2; // Initial X position
@@ -148,12 +148,15 @@ function gameOver() {
           if (result.data.ranking.length > 0) {
             const containner = document.getElementById('sub-leaderboard')
             containner.innerHTML = ''
+            const rank = await result.data.ranking?.findIndex(data => data.role == 'you') + 1
             await result.data.ranking?.map(data => {
               if (data.role == 'you')
                 totalScore = data.score
               if (data.rank == 1) {
                 if (data.role == 'you') {
                   document.getElementById('first_you').style.display = 'block'
+                } else {
+                  document.getElementById('first_you').style.display = 'none'
                 }
                 document.getElementById('first_place-name').innerHTML = data.name
                 document.getElementById('first_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -164,6 +167,8 @@ function gameOver() {
               } else if (data.rank == 2) {
                 if (data.role == 'you') {
                   document.getElementById('second_you').style.display = 'block'
+                } else {
+                  document.getElementById('second_you').style.display = 'none'
                 }
                 document.getElementById('second_place-name').innerHTML = data.name
                 document.getElementById('second_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -174,6 +179,8 @@ function gameOver() {
               } else if (data.rank == 3) {
                 if (data.role == 'you') {
                   document.getElementById('third_you').style.display = 'block'
+                } else {
+                  document.getElementById('third_you').style.display = 'none'
                 }
                 document.getElementById('third_place-name').innerHTML = data.name
                 document.getElementById('third_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
@@ -181,14 +188,14 @@ function gameOver() {
                 document.getElementById('thankRank').innerHTML = 3
                 document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
                 document.getElementById('thankScore').innerHTML = data.score
-              } else {
+              } else if (data.rank >= rank - 10 && rank <= rank + 10) {
                 const card = document.createElement("div")
                 card.classList.add("card-leaderboard")
                 if (data.role == 'you')
                   card.classList.add("blue-border")
-                card.id = data.role
+                // card.id = data.role
                 const content = `
-                ${data.role == 'you' ? `<img class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
+                ${data.role == 'you' ? `<img id='you' class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
                 <div class="d-flex">
                   <div style="width: 15%;padding-left: 2px;">
                     ${data.rank}
@@ -210,22 +217,40 @@ function gameOver() {
             })
             window.location.href = '#you'
           }
-          if (result.data.yourRank) {
-            totalScore = result.data.yourRank[0].score
-            document.getElementById('sub-leaderboard').style.height = '35%'
-            document.getElementById('fix-leaderboard').style.display = 'block'
-            document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
-            document.getElementById('yourName').innerHTML = ' ' + result.data.yourRank[0].phone.slice(-4)
-            document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${result.data.phone.slice(-4)}</span>`
-            document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
-          } else {
-            document.getElementById('sub-leaderboard').style.height = '50%'
+          // if (result.data.yourRank) {
+          //   totalScore = result.data.yourRank[0].score
+          //   document.getElementById('sub-leaderboard').style.height = '35%'
+          //   document.getElementById('fix-leaderboard').style.display = 'block'
+          //   document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
+          //   document.getElementById('yourName').innerHTML = ' ' + result.data.yourRank[0].phone.slice(-4)
+          //   document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${result.data.phone.slice(-4)}</span>`
+          //   document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
+          // } else {
+            document.getElementById('sub-leaderboard').style.height = '54%'
             document.getElementById('fix-leaderboard').style.display = 'none'
-          }
+          // }
         })
-    }).catch(() => {
+    }).catch((err) => {
       alert('การบันทึกไม่สำเร็จ กรุณาลองใหม่ภายหลัง')
     })
+}
+
+function getElementPosition(elementId) {
+  // Get the element
+  var element = document.getElementById(elementId);
+  if (!element) {
+    console.error('Element not found');
+    return null;
+  }
+
+  // Get the bounding client rect
+  var rect = element.getBoundingClientRect();
+
+  // Get the x and y position
+  var x = rect.left + window.scrollX;
+  var y = rect.top + window.scrollY;
+
+  return { x: x, y: y };
 }
 
 function getRandomNumber() {
@@ -246,11 +271,9 @@ function submit(e) {
   const thankName = document.getElementById('thankName')
   const thankPhone = document.getElementById('thankPhone')
   const thankScore = document.getElementById('thankScore')
-  const thankImg = document.getElementById('thankImg')
   e.preventDefault();
   axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString(), score: score.toString() })
     .then(res => {
-      thankImg.src = window.localStorage.getItem('image')
       thankRank.innerHTML = res.data.rank
       thankName.innerHTML = res.data.name
       thankPhone.innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${res.data.phone.slice(-4)}</span>`
@@ -260,6 +283,7 @@ function submit(e) {
       window.localStorage.setItem('phone', phone.value)
       document.getElementById('result-form-phone').style.display = 'block'
     }).catch((err) => {
+      console.log('err', err)
       window.localStorage.removeItem('phone')
       alert('การบันทึกไม่สำเร็จ กรุณาลองใหม่ภายหลัง')
     })
@@ -372,52 +396,55 @@ document.getElementById('result-form').addEventListener('submit', function (even
   submit(event)
 })
 document.getElementById('football').addEventListener('mousedown', function () {
-  score += scoreA
+  score++
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-  document.getElementById('score-value').textContent = score;
-  document.getElementById('score-sum').textContent = score;
+  document.getElementById('score-value').textContent = score
+  document.getElementById('score-sum').textContent = score
   getRandomNumber()
   cooldown = 100
   const gotone = document.getElementById('gotone')
   const audio = new Audio("gotone.mp3");
   audio.play()
-  gotone.style.display = 'block'
+  // gotone.style.display = 'block'
   setTimeout(() => {
-    gotone.style.display = 'none'
-  }, 500)
+    img.remove()
+    // gotone.style.display = 'none'
+  }, 200)
 })
 
 document.getElementById('football_2').addEventListener('mousedown', function () {
-  score += scoreA
+  score++
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-  document.getElementById('score-value').textContent = score;
-  document.getElementById('score-sum').textContent = score;
+  document.getElementById('score-value').textContent = score
+  document.getElementById('score-sum').textContent = score
   getRandomNumber_2()
   cooldown_2 = 150
   const gotone = document.getElementById('gotone')
   const audio = new Audio("gotone.mp3");
   audio.play()
-  gotone.style.display = 'block'
+  // gotone.style.display = 'block'
   setTimeout(() => {
-    gotone.style.display = 'none'
-  }, 500)
+    img.remove()
+    // gotone.style.display = 'none'
+  }, 200)
 })
 
-function bonusClick(element) {
+function bonusClick(event) {
   hand.classList.add('active')
-  score += scoreB
+  score += 3
   bonusCheck = true
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
-  document.getElementById('score-value').textContent = score;
-  document.getElementById('score-sum').textContent = score;
+  document.getElementById('score-value').textContent = score
+  document.getElementById('score-sum').textContent = score
   getRandomNumber()
   cooldown = 100
   const gotone = document.getElementById('gottwo')
   const audio = new Audio("gottwo.mp3");
   audio.play()
-  gotone.style.display = 'block'
+  // gotone.style.display = 'block'
   setTimeout(() => {
-    gotone.style.display = 'none'
+    img.remove()
+    // gotone.style.display = 'none'
   }, 200)
 }
 function bombClick(element) {
@@ -427,21 +454,21 @@ function bombClick(element) {
   gameOver()
 }
 
-document.getElementById('bonus1').addEventListener('mousedown', function () {
-  bonusClick(this)
+document.getElementById('bonus1').addEventListener('touchstart', function (event) {
+  bonusClick(event)
 })
-document.getElementById('bonus2').addEventListener('mousedown', function () {
-  bonusClick(this)
+document.getElementById('bonus2').addEventListener('touchstart', function (event) {
+  bonusClick(event)
 })
-document.getElementById('bonus3').addEventListener('mousedown', function () {
-  bonusClick(this)
+document.getElementById('bonus3').addEventListener('touchstart', function (event) {
+  bonusClick(event)
 })
 
-document.getElementById('bomb').addEventListener('mousedown', function () {
+document.getElementById('bomb').addEventListener('touchstart', function () {
   bombClick(this)
 })
 
-document.getElementById('bomb_2').addEventListener('mousedown', function () {
+document.getElementById('bomb_2').addEventListener('touchstart', function () {
   bombClick(this)
 })
 
@@ -544,9 +571,9 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 document.addEventListener('dragstart', function (event) {
   event.preventDefault()
 })
-document.addEventListener('touchstart'), event => {
+document.addEventListener('touchstart', event => {
   event.preventDefault()
-}
+})
 function openModal() {
   $('#exampleModalLong').modal('show')
 }
