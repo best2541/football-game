@@ -35,15 +35,19 @@ module.exports = {
         }
     },
     getServerStatus: (req, res, next) => {
-        db.query(`select server_status.status 'server_status' from server_status`
-            , (err, result) => {
-                if (err) res.status(400).send({ err: err.message })
-                req.datas.server_status = result[0]
-                next()
-            })
+        try {
+            db.query(`select server_status.status 'server_status' from server_status`
+                , (err, result) => {
+                    if (err) res.status(400).send({ err: err.message })
+                    req.datas.server_status = result[0]
+                    next()
+                })
+        } catch (err) {
+            console.log('err', err)
+        }
     },
     getSetting: (req, res, next) => {
-        db.query('select level, time_limit_level from hard_setting'
+        db.query('select level, time_limit_level, type from hard_setting'
             , (err, result) => {
                 if (err) res.status(400).send({ err: err.message })
                 req.datas.setting = result[0]

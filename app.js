@@ -39,6 +39,9 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 })
 global.db = db
+// app.use('/game', cors(), require('./routes/game.js'))
+// app.use('/dashboard', cors(), require('./routes/dashboard.js'))
+// app.use('/setting', cors(), require('./routes/setting.js'))
 app.use('/game', cors(corsOptions), require('./routes/game.js'))
 app.use('/dashboard', cors(corsOptions), require('./routes/dashboard.js'))
 app.use('/setting', cors(corsOptions), require('./routes/setting.js'))
@@ -84,7 +87,8 @@ app.get('/schema', (req, res) => {
 
     knex.schema.createTable('hard_setting', (table) => {
         table.float('level').primary(),
-            table.integer('time_limit_level').defaultTo(4)
+            table.integer('time_limit_level').defaultTo(4),
+            table.date('type').defaultTo(null)
     })
         .then(() => {
             console.log('hard_setting created')

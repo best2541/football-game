@@ -1,4 +1,6 @@
-// let time = performance.now()
+let type = 1
+let scoreA = 1
+let scoreB = 3
 let rank = 999
 let score = 0
 let totalScore = 0
@@ -74,9 +76,28 @@ if (!(window.location.href).startsWith("file://") && !(window.location.href).sta
     window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004588192&redirect_uri=https://central-game.ants.co.th&state=${new Date().getTime()}&scope=profile%20openid`
   }
 }
-
+function checkStart() {
+  if (window.localStorage.getItem('type') && new Date(window.localStorage.getItem('type')) > new Date()) {
+    document.getElementById('info').src = './img/info2.png'
+    document.getElementById('gotone').src = './img/gotone2.png'
+    document.getElementById('gottwo').src = './img/gottwo2.png'
+    document.getElementById('info-one').innerHTML = 'ลูกฟุตบอล 1 ลูก ได้ 2 แต้ม'
+    document.getElementById('info-two').innerHTML = 'ฟุตบอลที่มีโลโก้ 3 แบบ 1 ลูก ได้ 6 แต้ม'
+    scoreA = 2
+    scoreB = 6
+  } else {
+    document.getElementById('info').src = './img/info.png'
+    document.getElementById('gotone').src = './img/gotone.png'
+    document.getElementById('gottwo').src = './img/gottwo.png'
+    document.getElementById('info-one').innerHTML = 'ลูกฟุตบอล 1 ลูก ได้ 1 แต้ม'
+    document.getElementById('info-two').innerHTML = 'ฟุตบอลที่มีโลโก้ 3 แบบ 1 ลูก ได้ 3 แต้ม'
+    scoreA = 1
+    scoreB = 3
+  }
+}
 //getstart
 function getStart() {
+  checkStart()
   axios.post(`${api}/game/getstart`)
     .then(result => {
       if (result.data.server_status.server_status != 1)
@@ -91,6 +112,7 @@ function getStart() {
       if (result?.data?.setting) {
         defaultHardLevel = result.data.setting.level
         timeLimitLevel = result.data.setting.time_limit_level
+        window.localStorage.setItem('type', result.data.setting.type)
         hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
         getRandomNumber()
         getRandomNumber_2()
@@ -350,7 +372,7 @@ document.getElementById('result-form').addEventListener('submit', function (even
   submit(event)
 })
 document.getElementById('football').addEventListener('mousedown', function () {
-  score++
+  score += scoreA
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
   document.getElementById('score-sum').textContent = score;
@@ -366,7 +388,7 @@ document.getElementById('football').addEventListener('mousedown', function () {
 })
 
 document.getElementById('football_2').addEventListener('mousedown', function () {
-  score++
+  score += scoreA
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
   document.getElementById('score-sum').textContent = score;
@@ -383,7 +405,7 @@ document.getElementById('football_2').addEventListener('mousedown', function () 
 
 function bonusClick(element) {
   hand.classList.add('active')
-  score += 3
+  score += scoreB
   bonusCheck = true
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score;
@@ -424,7 +446,6 @@ document.getElementById('bomb_2').addEventListener('mousedown', function () {
 })
 
 const setTimer = () => {
-  console.log('timer start')
   document.getElementById('time').innerHTML = `${Math.floor(timeLimitLevel / 2)}:${timeLimitLevel % 2 == 0 ? '00' : '30'}`
   let timer = 0
   const limitTimer = 30 * timeLimitLevel
@@ -443,6 +464,7 @@ const setTimer = () => {
   }, 1000)
 }
 const startGame = () => {
+  checkStart()
   score = 0
   document.getElementById('time').innerHTML = '0:00'
   document.getElementById('score-sum').textContent = 0
