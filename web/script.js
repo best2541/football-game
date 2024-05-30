@@ -76,6 +76,7 @@ if (!(window.location.href).startsWith("file://") && !(window.location.href).sta
     window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004588192&redirect_uri=https://central-game.ants.co.th&state=${new Date().getTime()}&scope=profile%20openid`
   }
 }
+
 function checkStart() {
   if (window.localStorage.getItem('type') && new Date(window.localStorage.getItem('type')) > new Date()) {
     document.getElementById('info').src = './img/info2.png'
@@ -95,6 +96,7 @@ function checkStart() {
     scoreB = 3
   }
 }
+
 //getstart
 function getStart() {
   checkStart()
@@ -226,8 +228,8 @@ function gameOver() {
           //   document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${result.data.phone.slice(-4)}</span>`
           //   document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
           // } else {
-            document.getElementById('sub-leaderboard').style.height = '54%'
-            document.getElementById('fix-leaderboard').style.display = 'none'
+          document.getElementById('sub-leaderboard').style.height = '54%'
+          document.getElementById('fix-leaderboard').style.display = 'none'
           // }
         })
     }).catch((err) => {
@@ -395,8 +397,17 @@ async function updateFootballPosition() {
 document.getElementById('result-form').addEventListener('submit', function (event) {
   submit(event)
 })
-document.getElementById('football').addEventListener('mousedown', function () {
-  score++
+document.getElementById('football').addEventListener('touchstart', function (event) {
+  var touch = event.touches[0]
+  var x = touch.clientX
+  var y = touch.clientY
+  const img = document.createElement('img')
+  img.classList.add('gotone')
+  img.src = './img/gotone.png'
+  img.style.left = x + 'px'
+  img.style.top = y + 'px'
+  document.getElementById('containner').appendChild(img)
+  score +=scoreA
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score
   document.getElementById('score-sum').textContent = score
@@ -412,8 +423,17 @@ document.getElementById('football').addEventListener('mousedown', function () {
   }, 200)
 })
 
-document.getElementById('football_2').addEventListener('mousedown', function () {
-  score++
+document.getElementById('football_2').addEventListener('touchstart', function (event) {
+  var touch = event.touches[0]
+  var x = touch.clientX
+  var y = touch.clientY
+  const img = document.createElement('img')
+  img.classList.add('gotone')
+  img.src = './img/gotone.png'
+  img.style.left = x + 'px'
+  img.style.top = y + 'px'
+  document.getElementById('containner').appendChild(img)
+  score += scoreA
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score
   document.getElementById('score-sum').textContent = score
@@ -431,7 +451,16 @@ document.getElementById('football_2').addEventListener('mousedown', function () 
 
 function bonusClick(event) {
   hand.classList.add('active')
-  score += 3
+  var touch = event.touches[0]
+  var x = touch.clientX
+  var y = touch.clientY
+  const img = document.createElement('img')
+  img.classList.add('gotone')
+  img.src = './img/gottwo.png'
+  img.style.left = x + 'px'
+  img.style.top = y + 'px'
+  document.getElementById('containner').appendChild(img)
+  score += scoreB
   bonusCheck = true
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score
