@@ -25,7 +25,7 @@ let bonusCheck = false
 let defaultHardLevel = 1
 let hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
 let isOver = true
-const api = 'https://central-game.ants.co.th'
+const api = 'http://localhost:3000'
 let timeLimitLevel = 4
 let token
 
@@ -79,7 +79,7 @@ if (!(window.location.href).startsWith("file://") && !(window.location.href).sta
 
 function checkStart() {
   if (window.localStorage.getItem('type') && new Date(window.localStorage.getItem('type')) > new Date()) {
-    document.getElementById('info').src = './img/info2.png'
+    // document.getElementById('info').src = './img/info2.png'
     document.getElementById('gotone').src = './img/gotone2.png'
     document.getElementById('gottwo').src = './img/gottwo2.png'
     document.getElementById('info-one').innerHTML = 'ลูกฟุตบอล 1 ลูก ได้ 2 แต้ม'
@@ -87,7 +87,7 @@ function checkStart() {
     scoreA = 2
     scoreB = 6
   } else {
-    document.getElementById('info').src = './img/info.png'
+    // document.getElementById('info').src = './img/info.png'
     document.getElementById('gotone').src = './img/gotone.png'
     document.getElementById('gottwo').src = './img/gottwo.png'
     document.getElementById('info-one').innerHTML = 'ลูกฟุตบอล 1 ลูก ได้ 1 แต้ม'
@@ -591,11 +591,11 @@ document.addEventListener("DOMContentLoaded", function () {
 //       console.log(err)
 //     })
 // });
-if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-  // Mobile device detected
-} else {
-  window.location.href = '/notsupport'
-}
+// if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+//   // Mobile device detected
+// } else {
+//   window.location.href = '/notsupport'
+// }
 
 document.addEventListener('dragstart', function (event) {
   event.preventDefault()

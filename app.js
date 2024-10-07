@@ -8,7 +8,7 @@ const encrypt = require('./utilities/encrypt')
 
 app.use(express.json())
 app.use(express.urlencoded())
-const whitelist = ['https://central-game.ants.co.th', 'https://central-game-cms.ants.co.th']
+const whitelist = ['*']
 const corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
@@ -42,9 +42,9 @@ global.db = db
 // app.use('/game', cors(), require('./routes/game.js'))
 // app.use('/dashboard', cors(), require('./routes/dashboard.js'))
 // app.use('/setting', cors(), require('./routes/setting.js'))
-app.use('/game', cors(corsOptions), require('./routes/game.js'))
-app.use('/dashboard', cors(corsOptions), require('./routes/dashboard.js'))
-app.use('/setting', cors(corsOptions), require('./routes/setting.js'))
+app.use('/game', cors(), require('./routes/game.js'))
+app.use('/dashboard', cors(), require('./routes/dashboard.js'))
+app.use('/setting', cors(), require('./routes/setting.js'))
 
 app.get('/test', (req, res) => {
     res.send('test : ok')

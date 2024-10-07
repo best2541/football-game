@@ -91,6 +91,23 @@ h1 {
   /* animation: ball-rotation 5s linear infinite !important; */
 }
 
+.ranking {
+  position: absolute;
+  width: 100vw;
+  height: 20vh;
+}
+.ranking-head {
+  /* transform: translate(-50%, -50%); */
+}
+
+.ranking-score {
+  transform: translate(-50%, 0%);
+  position: absolute;
+  top: 11vh;
+  left: 50%;
+  /* z-index: 999; */
+}
+
 #startBtn2 {
   width: 280px;
   position: absolute;
@@ -200,7 +217,7 @@ h1 {
 
 #score-value {
   position: absolute;
-  transform: translate(-50%, -10%);
+  transform: translate(-0%, -10%);
 }
 
 #score-sum {
@@ -436,6 +453,7 @@ h1 {
 .profile-bg {
   position: relative;
   height: 90px;
+  display: none;
 }
 
 .profile {
@@ -455,12 +473,12 @@ h1 {
   color: white;
   width: 100%;
   height: 100px;
-  background-color: red;
+  /* background-color: red; */
 }
 
 .leaderboard {
   position: absolute;
-  top: 120px;
+  top: 22vh;
   left: 50%;
   transform: translate(-50%, 0);
   width: 80%;
@@ -470,9 +488,9 @@ h1 {
 
 .sub-leaderboard {
   position: absolute;
-  top: 46%;
+  top: 55%;
   width: 100%;
-  height: 35%;
+  height: 25%;
   padding-top: 2.5%;
   overflow-y: auto;
   overflow-x: hidden;
@@ -504,7 +522,9 @@ h1 {
   position: relative;
   z-index: 999;
 }
-
+#sub-leaderboard > div {
+  height: 30px;
+}
 .result-form {
   position: absolute;
   top: 80%;

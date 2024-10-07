@@ -68,9 +68,9 @@
     <!-- start -->
     <div id="start-containner">
         <img src="./img/BG.jpg" class="background">
-        <img src="./img/company.png" class="company-img">
+        <!-- <img src="./img/company.png" class="company-img"> -->
         <img src="./img/LOGO.png" class="logo-img">
-        <img id="info" src="./img/info.png" class="info-img">
+        <!-- <img id="info" src="./img/info.png" class="info-img"> -->
         <div id="startBtn2" class="align-middle">
             <button id="begin" onclick="startGame()">
                 <img src="./img/BTN-Start.png" style="width: 100%;height: auto;"></img>
@@ -85,13 +85,19 @@
     <!-- result -->
     <div id="result-containner" style="display: none;">
         <div class="header border-bt-curve score-d-flex">
-            <div class="profile-bg">
-                <img src="./img/Profiles.png" style="height: 100%;">
-                <img id="profile" class="profile" src="./img/Profiles.png">
+            <div class="ranking">
+                <h1 class="ranking-score">0</h1>
+                <img class="ranking-head" src="./img/ranking_head.png">
             </div>
-            <div>
-                <h4 style="margin-top: 3%;">รอบนี้คุณได้คะแนน</h4>
-                <h1 id="score-sum">0</h1>
+            <div style="display: none;">
+                <div class="profile-bg">
+                    <img src="./img/Profiles.png" style="height: 100%;">
+                    <img id="profile" class="profile" src="./img/Profiles.png">
+                </div>
+                <div>
+                    <h4 style="margin-top: 3%;">รอบนี้คุณได้คะแนน</h4>
+                    <h1 id="score-sum">0</h1>
+                </div>
             </div>
         </div>
         <div class="leaderboard">
