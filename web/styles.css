@@ -349,7 +349,7 @@ h1 {
   width: 20%;
   height: 120%;
   text-align: center;
-  background-color: #0087e2;
+  background-color: #f7931e;
   border-top-left-radius: 15%;
   border-bottom-left-radius: 15%;
   border-top-right-radius: 23px;
@@ -390,7 +390,7 @@ h1 {
 }
 
 .blue-border {
-  border: solid 2px #0087e2;
+  border: solid 2px #f7931e;
 }
 
 .user-img {
@@ -521,7 +521,7 @@ h1 {
   margin-top: 10px;
   margin-bottom: 10px;
   border-radius: 10px;
-  color: #0087e2;
+  color: #f7931e;
   font-weight: 550;
   font-size: 1.2rem;
   position: relative;

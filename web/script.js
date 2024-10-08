@@ -29,53 +29,6 @@ const api = 'http://localhost:3000'
 let timeLimitLevel = 4
 let token
 
-//Line Auth
-const urlParams = new URLSearchParams(window.location.search);
-const code = urlParams.get('code');
-const state = urlParams.get('state')
-if (!(window.location.href).startsWith("file://") && !(window.location.href).startsWith("http://localhost")) {
-
-  if (code && state) {
-    axios.post('https://api.line.me/oauth2/v2.1/token', {
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: 'https://central-game.ants.co.th',
-      client_id: '2004588192',
-      client_secret: '792518900ce4dca2b5b90f0768840180'
-    }, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    }).then(result => {
-      if (result?.data?.id_token) {
-        token = result.data.id_token
-        axios.post(`${api}/game/getuser`, {
-          token: token
-        }).then(result => {
-          if (result.data) {
-            rank = result.data?.rank || 999
-            window.localStorage.setItem('uid', result.data.sub)
-            window.localStorage.setItem('name', result.data.name)
-            window.localStorage.setItem('image', result.data.picture)
-            if (result.data.phone) {
-              window.localStorage.setItem('phone', result.data.phone)
-            } else {
-              window.localStorage.removeItem('phone')
-            }
-            if (result.data.score) {
-              totalScore = result.data.score
-            }
-          }
-        })
-      }
-    })
-      .catch(err => {
-        window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004588192&redirect_uri=https://central-game.ants.co.th&state=${new Date().getTime()}&scope=profile%20openid`
-      })
-  } else {
-    window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004588192&redirect_uri=https://central-game.ants.co.th&state=${new Date().getTime()}&scope=profile%20openid`
-  }
-}
 
 function checkStart() {
   if (window.localStorage.getItem('type') && new Date(window.localStorage.getItem('type')) > new Date()) {
@@ -104,13 +57,13 @@ function getStart() {
     .then(result => {
       if (result.data.server_status.server_status != 1)
         throw new Error('server is offline')
-      if (result?.data?.user.length > 0) {
-        window.localStorage.setItem('uid', result.data.user[0].uid)
-        window.localStorage.setItem('name', result.data.user[0].name)
-        window.localStorage.setItem('image', result.data.user[0].picture)
-        if (result.data.user[0].phone)
-          window.localStorage.setItem('phone', result.data.user[0].phone)
-      }
+      // if (result?.data?.user.length > 0) {
+      //   window.localStorage.setItem('uid', result.data.user[0].uid)
+      //   window.localStorage.setItem('name', result.data.user[0].name)
+      //   window.localStorage.setItem('image', result.data.user[0].picture)
+      //   if (result.data.user[0].phone)
+      //     window.localStorage.setItem('phone', result.data.user[0].phone)
+      // }
       if (result?.data?.setting) {
         defaultHardLevel = result.data.setting.level
         timeLimitLevel = result.data.setting.time_limit_level
@@ -143,60 +96,58 @@ function gameOver() {
     document.getElementById('result-form-phone').style.display = 'none'
   }
   check = true
-  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), name: localStorage.getItem('name'), score: phone?.toString()?.length > 0 ? score.toString() : '-999' })
-    .then(() => {
-      axios.post(`${api}/game/getranking?uid=${window.localStorage.getItem('uid')}`)
-        .then(async result => {
-          if (result.data.ranking.length > 0) {
-            const containner = document.getElementById('sub-leaderboard')
-            containner.innerHTML = ''
-            const rank = await result.data.ranking?.findIndex(data => data.role == 'you') + 1
-            await result.data.ranking?.map(data => {
-              if (data.role == 'you')
-                totalScore = data.score
-              if (data.rank == 1) {
-                if (data.role == 'you') {
-                  document.getElementById('first_you').style.display = 'block'
-                } else {
-                  document.getElementById('first_you').style.display = 'none'
-                }
-                document.getElementById('first_place-name').innerHTML = data.name
-                document.getElementById('first_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-                document.getElementById('first_place-score').innerHTML = data.score
-                document.getElementById('thankRank').innerHTML = 1
-                document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-                document.getElementById('thankScore').innerHTML = data.score
-              } else if (data.rank == 2) {
-                if (data.role == 'you') {
-                  document.getElementById('second_you').style.display = 'block'
-                } else {
-                  document.getElementById('second_you').style.display = 'none'
-                }
-                document.getElementById('second_place-name').innerHTML = data.name
-                document.getElementById('second_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-                document.getElementById('second_place-score').innerHTML = data.score
-                document.getElementById('thankRank').innerHTML = 2
-                document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-                document.getElementById('thankScore').innerHTML = data.score
-              } else if (data.rank == 3) {
-                if (data.role == 'you') {
-                  document.getElementById('third_you').style.display = 'block'
-                } else {
-                  document.getElementById('third_you').style.display = 'none'
-                }
-                document.getElementById('third_place-name').innerHTML = data.name
-                document.getElementById('third_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-                document.getElementById('third_place-score').innerHTML = data.score
-                document.getElementById('thankRank').innerHTML = 3
-                document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-                document.getElementById('thankScore').innerHTML = data.score
-              } else if (data.rank >= rank - 10 && rank <= rank + 10) {
-                const card = document.createElement("div")
-                card.classList.add("card-leaderboard")
-                if (data.role == 'you')
-                  card.classList.add("blue-border")
-                // card.id = data.role
-                const content = `
+  axios.post(`${api}/game/getranking?uid=${window.localStorage.getItem('uid')}`)
+    .then(async result => {
+      if (result.data.ranking.length > 0) {
+        const containner = document.getElementById('sub-leaderboard')
+        containner.innerHTML = ''
+        const rank = await result.data.ranking?.findIndex(data => data.role == 'you') + 1
+        await result.data.ranking?.map(data => {
+          if (data.role == 'you')
+            totalScore = data.score
+          if (data.rank == 1) {
+            if (data.role == 'you') {
+              document.getElementById('first_you').style.display = 'block'
+            } else {
+              document.getElementById('first_you').style.display = 'none'
+            }
+            document.getElementById('first_place-name').innerHTML = data.name
+            document.getElementById('first_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
+            document.getElementById('first_place-score').innerHTML = data.score
+            document.getElementById('thankRank').innerHTML = 1
+            document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
+            document.getElementById('thankScore').innerHTML = data.score
+          } else if (data.rank == 2) {
+            if (data.role == 'you') {
+              document.getElementById('second_you').style.display = 'block'
+            } else {
+              document.getElementById('second_you').style.display = 'none'
+            }
+            document.getElementById('second_place-name').innerHTML = data.name
+            document.getElementById('second_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
+            document.getElementById('second_place-score').innerHTML = data.score
+            document.getElementById('thankRank').innerHTML = 2
+            document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
+            document.getElementById('thankScore').innerHTML = data.score
+          } else if (data.rank == 3) {
+            if (data.role == 'you') {
+              document.getElementById('third_you').style.display = 'block'
+            } else {
+              document.getElementById('third_you').style.display = 'none'
+            }
+            document.getElementById('third_place-name').innerHTML = data.name
+            document.getElementById('third_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
+            document.getElementById('third_place-score').innerHTML = data.score
+            document.getElementById('thankRank').innerHTML = 3
+            document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
+            document.getElementById('thankScore').innerHTML = data.score
+          } else if (data.rank >= rank - 10 && rank <= rank + 10) {
+            const card = document.createElement("div")
+            card.classList.add("card-leaderboard")
+            if (data.role == 'you')
+              card.classList.add("blue-border")
+            // card.id = data.role
+            const content = `
                 ${data.role == 'you' ? `<img id='you' class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
                 <div class="d-flex">
                   <div style="width: 15%;padding-left: 2px;">
@@ -213,27 +164,24 @@ function gameOver() {
                   </div>
                 </div>
               `
-                card.innerHTML = content;
-                containner.appendChild(card)
-              }
-            })
-            window.location.href = '#you'
+            card.innerHTML = content;
+            containner.appendChild(card)
           }
-          // if (result.data.yourRank) {
-          //   totalScore = result.data.yourRank[0].score
-          //   document.getElementById('sub-leaderboard').style.height = '35%'
-          //   document.getElementById('fix-leaderboard').style.display = 'block'
-          //   document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
-          //   document.getElementById('yourName').innerHTML = ' ' + result.data.yourRank[0].phone.slice(-4)
-          //   document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${result.data.phone.slice(-4)}</span>`
-          //   document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
-          // } else {
-          document.getElementById('sub-leaderboard').style.height = '54%'
-          document.getElementById('fix-leaderboard').style.display = 'none'
-          // }
         })
-    }).catch((err) => {
-      alert('การบันทึกไม่สำเร็จ กรุณาลองใหม่ภายหลัง')
+        window.location.href = '#you'
+      }
+      // if (result.data.yourRank) {
+      //   totalScore = result.data.yourRank[0].score
+      //   document.getElementById('sub-leaderboard').style.height = '35%'
+      //   document.getElementById('fix-leaderboard').style.display = 'block'
+      //   document.getElementById('yourRank').innerHTML = result.data.yourRank[0].role
+      //   document.getElementById('yourName').innerHTML = ' ' + result.data.yourRank[0].phone.slice(-4)
+      //   document.getElementById('yourPhone').innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${result.data.phone.slice(-4)}</span>`
+      //   document.getElementById('yourScore').innerHTML = result.data.yourRank[0].score
+      // } else {
+      document.getElementById('sub-leaderboard').style.height = '54%'
+      document.getElementById('fix-leaderboard').style.display = 'none'
+      // }
     })
 }
 
@@ -274,7 +222,7 @@ function submit(e) {
   const thankPhone = document.getElementById('thankPhone')
   const thankScore = document.getElementById('thankScore')
   e.preventDefault();
-  axios.post(`${api}/game/save`, { uid: localStorage.getItem('uid'), phone: (phone.value).toString(), score: score.toString() })
+  axios.post(`${api}/game/save`, { uid: (phone.value).toString(), phone: (phone.value).toString(), score: score.toString() })
     .then(res => {
       thankRank.innerHTML = res.data.rank
       thankName.innerHTML = res.data.name
@@ -407,7 +355,7 @@ document.getElementById('football').addEventListener('touchstart', function (eve
   img.style.left = x + 'px'
   img.style.top = y + 'px'
   document.getElementById('containner').appendChild(img)
-  score +=scoreA
+  score += scoreA
   hardLevel = (Math.floor(score / 5) * 0.2) + defaultHardLevel
   document.getElementById('score-value').textContent = score
   document.getElementById('score-sum').textContent = score

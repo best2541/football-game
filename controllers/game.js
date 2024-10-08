@@ -14,53 +14,53 @@ module.exports = {
     auth: (req, res, next) => {
         try {
             const decodedToken = jwt.decode(req.body.token)
-            db.query(`
+            knex.raw(`
             select a.rank + b.rank + 1 'rank', c.phone , c.score FROM
 (select count(uid) 'rank' from profile where score >(select score from profile where uid ='${decodedToken.sub}') and phone is not null) as a,
 (select count(uid) 'rank' from profile where score =(select score from profile where uid ='${decodedToken.sub}') and update_date < (select update_date from profile where uid = '${decodedToken.sub}') and phone is not null) as b,
 (select phone, profile.score from profile where uid = '${decodedToken.sub}') as c`
-                , (err, result) => {
-                    if (err) res.status(400).send({ err: err.message })
-                    if (result.length > 0) {
-                        console.log('test!!!!!!!!!!!!!!!!')
-                        decodedToken.phone = result[0].phone
-                        decodedToken.rank = result[0].rank
-                        decodedToken.score = result[0].score
-                    }
-                    res.send(decodedToken)
+            ).then(result => {
+                if (result.length > 0) {
+                    console.log('test!!!!!!!!!!!!!!!!')
+                    decodedToken.phone = result[0].phone
+                    decodedToken.rank = result[0].rank
+                    decodedToken.score = result[0].score
                 }
-            )
+                res.send(decodedToken)
+            })
         } catch (err) {
             res.status(500).send({ err: err.message })
         }
     },
     getServerStatus: (req, res, next) => {
         try {
-            db.query(`select server_status.status 'server_status' from server_status`
-                , (err, result) => {
-                    if (err) res.status(400).send({ err: err.message })
-                    req.datas.server_status = result[0]
-                    next()
-                })
+            knex.raw(`select server_status.status 'server_status' from server_status`
+            ).then(result => {
+                req.datas.server_status = result[0]
+                next()
+            })
         } catch (err) {
             console.log('err', err)
+            res.status(400).send({ err: err.message })
         }
     },
     getSetting: (req, res, next) => {
-        db.query('select level, time_limit_level, type from hard_setting'
-            , (err, result) => {
-                if (err) res.status(400).send({ err: err.message })
-                req.datas.setting = result[0]
-                next()
-            })
+        knex.raw('select level, time_limit_level, type from hard_setting'
+        ).then(result => {
+            req.datas.setting = result[0]
+            next()
+        }).catch(err => {
+            res.status(400).send({ err: err.message })
+        })
     },
     getstart: (req, res, next) => {
-        db.query(`select profile.uid , profile.phone , profile.name , profile.score , hard_setting.time_limit_level from profile CROSS JOIN hard_setting where profile.uid = '${req.query.uid}'`
-            , (err, result) => {
-                if (err) res.status(400).send({ err: err.message })
-                req.datas.user = result
-                next()
-            })
+        knex.raw(`select profile.uid , profile.phone , profile.name , profile.score , hard_setting.time_limit_level from profile CROSS JOIN hard_setting where profile.uid = '${req.query.uid}'`
+        ).then(result => {
+            req.datas.user = result
+            next()
+        }).catch(err => {
+            res.status(400).send({ err: err.message })
+        })
     },
     save: (req, res, next) => {
         const { uid, score, name } = req.body
@@ -103,43 +103,67 @@ module.exports = {
                 .catch(() => {
                     validate(req, ['uid', 'phone', 'score'])
                         .then(() => {
-                            db.query(`update profile set phone = '${(req.body.phone).toString()}', score = ${req.body.score}, update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
-                                , (err, result) => {
-                                    if (err) throw err
-                                    db.query(`SELECT a.name, a.phone, b.rank + c.rank + 1 'rank', a.score 
+                            knex.raw(`
+                                MERGE INTO profile AS target
+                                USING (SELECT '${req.body.phone}' AS uid, ${req.body.score} AS score) AS source
+                                ON target.uid = source.uid
+                                WHEN MATCHED THEN
+                                UPDATE SET target.score = source.score
+                                WHEN NOT MATCHED THEN
+                                INSERT (uid, score) VALUES (source.uid, source.score);
+                                `).then(re => {
+                                knex.raw(`
+                                        SELECT a.name, a.phone, b.rank + c.rank + 1 'rank', a.score 
                                     FROM (
                                         SELECT name, phone, score 
                                         FROM profile 
-                                        WHERE uid = '${req.body.uid}'
+                                        WHERE uid = '${req.body.phone}'
                                     ) AS a
                                     CROSS JOIN (
                                         SELECT COUNT(uid) 'rank'
                                         FROM profile 
-                                        WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.uid}') and phone is not null
+                                        WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.phone}') and phone is not null
                                     ) AS b
                                     CROSS JOIN (
                                         select count(uid) 'rank' 
                                         from profile 
-                                        where score =(select score from profile where uid ='${req.body.uid}' and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null)
-                                    ) AS c`, (err, result) => {
-                                        if (err) {
-                                            console.log('1', err)
-                                            throw err
-                                        }
-                                        res.send(result[0])
+                                        where score =(select score from profile where uid ='${req.body.phone}' and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null)
+                                    ) AS c
+                                        `)
+                                    .then(result => {
+                                        res.send(result)
                                     })
-                                })
-                            db.query(
-                                `insert into play_record (uid,score,device) values ('${uid}', ${score},'${device}')`
-                                , (err, result) => {
-                                    if (err) {
-                                        console.log('2', err)
-                                        throw err
-                                    }
-                                }
-                            )
+                            })
+                            // db.query(`update profile set phone = '${(req.body.phone).toString()}', score = ${req.body.score}, update_date = CURRENT_TIMESTAMP() where uid = '${req.body.uid}'`
+                            //     , (err, result) => {
+                            //         if (err) throw err
+                            //         db.query(`SELECT a.name, a.phone, b.rank + c.rank + 1 'rank', a.score 
+                            //         FROM (
+                            //             SELECT name, phone, score 
+                            //             FROM profile 
+                            //             WHERE uid = '${req.body.uid}'
+                            //         ) AS a
+                            //         CROSS JOIN (
+                            //             SELECT COUNT(uid) 'rank'
+                            //             FROM profile 
+                            //             WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.uid}') and phone is not null
+                            //         ) AS b
+                            //         CROSS JOIN (
+                            //             select count(uid) 'rank' 
+                            //             from profile 
+                            //             where score =(select score from profile where uid ='${req.body.uid}' and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null)
+                            //         ) AS c`, (err, result) => {
+                            //             if (err) {
+                            //                 console.log('1', err)
+                            //                 throw err
+                            //             }
+                            //             res.send(result[0])
+                            //         })
+                            //     })
+                            knex.raw(
+                                `insert into play_record (uid,score,device) values ('${req.body.phone}', ${score},'${device}')`
+                            ).then()
                         })
-                        .catch(err2 => res.status(400).send({ err: err2.message }))
                 })
         } catch (err) {
             res.status(500).send({ err: err.message })
@@ -148,33 +172,37 @@ module.exports = {
     getRanking: (req, res, next) => {
         try {
             const uid = req.query.uid
-            db.query(`SELECT role, name, score, phone, @rank := @rank + 1 'rank'
-            FROM (
-                SELECT role, name, score, phone
-                FROM (
-                    SELECT IF(uid = '${uid}', 'you', '') 'role', name, score, phone
-                    FROM profile 
-                    WHERE phone IS NOT NULL
-                    ORDER BY score DESC , update_date ASC
-                ) AS a
-            ) AS ranks,
-            (SELECT @rank := 0) AS ordr;
-            `
-                , async (err, result) => {
-                    if (err) throw err
-                    req.datas.ranking = result
-                    const yourRank = await result.filter(x => x.role == 'you')
-                    if (yourRank.length === 0) {
-                        db.query(`select '999+' 'role', name, phone, score from profile where uid = '${uid}' and phone is not null`
-                            , (err, yourResult) => {
-                                if (err) throw err
-                                req.datas.yourRank = yourResult
-                                next()
-                            })
-                    } else {
-                        next()
-                    }
-                })
+            knex.raw(`select '' as role, uid as name, score, right(phone, 4) as phone, ROW_NUMBER() OVER (ORDER BY score DESC, update_date ASC) AS rank from profile;`).then(async result => {
+                req.datas.ranking = result
+                next()
+            })
+            // db.query(`SELECT role, name, score, phone, @rank := @rank + 1 'rank'
+            // FROM (
+            //     SELECT role, name, score, phone
+            //     FROM (
+            //         SELECT IF(uid = '${uid}', 'you', '') 'role', name, score, phone
+            //         FROM profile 
+            //         WHERE phone IS NOT NULL
+            //         ORDER BY score DESC , update_date ASC
+            //     ) AS a
+            // ) AS ranks,
+            // (SELECT @rank := 0) AS ordr;
+            // `
+            //     , async (err, result) => {
+            //         if (err) throw err
+            //         req.datas.ranking = result
+            //         const yourRank = await result.filter(x => x.role == 'you')
+            //         if (yourRank.length === 0) {
+            //             db.query(`select '999+' 'role', name, phone, score from profile where uid = '${uid}' and phone is not null`
+            //                 , (err, yourResult) => {
+            //                     if (err) throw err
+            //                     req.datas.yourRank = yourResult
+            //                     next()
+            //                 })
+            //         } else {
+            //             next()
+            //         }
+            //     })
         } catch (err) {
             res.status(500).send({ err: err.message })
         }
