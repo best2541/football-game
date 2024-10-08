@@ -315,6 +315,11 @@ h1 {
   width: 30%;
 }
 
+#result-btn-haveno_phone {
+  background-color: transparent;
+  border: none;
+}
+
 .score-d-flex {
   position: relative;
   display: flex;
