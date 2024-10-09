@@ -103,70 +103,32 @@ function gameOver() {
         containner.innerHTML = ''
         const rank = await result.data.ranking?.findIndex(data => data.role == 'you') + 1
         await result.data.ranking?.map(data => {
+          console.log('what', data)
           if (data.role == 'you')
             totalScore = data.score
-          if (data.rank == 1) {
-            if (data.role == 'you') {
-              document.getElementById('first_you').style.display = 'block'
-            } else {
-              document.getElementById('first_you').style.display = 'none'
-            }
-            document.getElementById('first_place-name').innerHTML = data.name
-            document.getElementById('first_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-            document.getElementById('first_place-score').innerHTML = data.score
-            document.getElementById('thankRank').innerHTML = 1
-            document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-            document.getElementById('thankScore').innerHTML = data.score
-          } else if (data.rank == 2) {
-            if (data.role == 'you') {
-              document.getElementById('second_you').style.display = 'block'
-            } else {
-              document.getElementById('second_you').style.display = 'none'
-            }
-            document.getElementById('second_place-name').innerHTML = data.name
-            document.getElementById('second_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-            document.getElementById('second_place-score').innerHTML = data.score
-            document.getElementById('thankRank').innerHTML = 2
-            document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-            document.getElementById('thankScore').innerHTML = data.score
-          } else if (data.rank == 3) {
-            if (data.role == 'you') {
-              document.getElementById('third_you').style.display = 'block'
-            } else {
-              document.getElementById('third_you').style.display = 'none'
-            }
-            document.getElementById('third_place-name').innerHTML = data.name
-            document.getElementById('third_place-phone').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-            document.getElementById('third_place-score').innerHTML = data.score
-            document.getElementById('thankRank').innerHTML = 3
-            document.getElementById('thankName').innerHTML = `เบอร์\n${data.phone.slice(-4)}`
-            document.getElementById('thankScore').innerHTML = data.score
-          } else if (data.rank >= rank - 10 && rank <= rank + 10) {
-            const card = document.createElement("div")
-            card.classList.add("card-leaderboard")
-            if (data.role == 'you')
-              card.classList.add("blue-border")
-            // card.id = data.role
-            const content = `
+          const card = document.createElement("div")
+          card.classList.add("card-leaderboard")
+          if (data.role == 'you')
+            card.classList.add("blue-border")
+          // card.id = data.role
+          const content = `
                 ${data.role == 'you' ? `<img id='you' class="you" style="z-index: 1000;" src="./img/you.png">` : ''}
                 <div class="d-flex">
                   <div style="width: 15%;padding-left: 2px;">
                     ${data.rank}
                   </div>
                   <div class="name" style="width: 40%;text-align: left;">
-                    ${data.name}
+                    <span class="text-sm">เบอร์</span><span class="">${data.name}</span>
                   </div>
                   <div class="" style="width: 25%;">
-                    <span class="text-sm">เบอร์</span><span class="text-s">${data.phone.slice(-4)}</span>
                   </div>
                   <div class="color-red" style="width: 20%;padding-right: 2px;">
                     ${data.score}
                   </div>
                 </div>
               `
-            card.innerHTML = content;
-            containner.appendChild(card)
-          }
+          card.innerHTML = content;
+          containner.appendChild(card)
         })
         window.location.href = '#you'
       }
@@ -224,13 +186,12 @@ function submit(e) {
   e.preventDefault();
   axios.post(`${api}/game/save`, { uid: (phone.value).toString(), phone: (phone.value).toString(), score: score.toString() })
     .then(res => {
-      thankRank.innerHTML = res.data.rank
-      thankName.innerHTML = res.data.name
-      thankPhone.innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${res.data.phone.slice(-4)}</span>`
-      thankScore.innerHTML = res.data.score
+      thankRank.innerHTML = res.data[0].rank
+      thankName.innerHTML = res.data[0].name
+      // thankPhone.innerHTML = `<span class="text-sm">เบอร์</span><span class="text-s">${res.data[0].phone}</span>`
+      thankScore.innerHTML = res.data[0].score
       result.style.display = 'none'
       thankyou.style.display = 'block'
-      window.localStorage.setItem('phone', phone.value)
       document.getElementById('result-form-phone').style.display = 'block'
     }).catch((err) => {
       console.log('err', err)

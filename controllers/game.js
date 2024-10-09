@@ -107,27 +107,27 @@ module.exports = {
                                 MERGE INTO profile AS target
                                 USING (SELECT '${req.body.phone}' AS uid, ${req.body.score} AS score) AS source
                                 ON target.uid = source.uid
-                                WHEN MATCHED THEN
-                                UPDATE SET target.score = source.score
+                                WHEN MATCHED AND source.score > target.score THEN
+                                UPDATE SET target.score = source.score , target.update_date = getdate()
                                 WHEN NOT MATCHED THEN
                                 INSERT (uid, score) VALUES (source.uid, source.score);
                                 `).then(re => {
                                 knex.raw(`
                                         SELECT a.name, a.phone, b.rank + c.rank + 1 'rank', a.score 
                                     FROM (
-                                        SELECT name, phone, score 
+                                        SELECT uid as name,uid as phone, score 
                                         FROM profile 
                                         WHERE uid = '${req.body.phone}'
                                     ) AS a
                                     CROSS JOIN (
                                         SELECT COUNT(uid) 'rank'
                                         FROM profile 
-                                        WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.phone}') and phone is not null
+                                        WHERE score > (SELECT score FROM profile WHERE uid = '${req.body.phone}')
                                     ) AS b
                                     CROSS JOIN (
                                         select count(uid) 'rank' 
                                         from profile 
-                                        where score =(select score from profile where uid ='${req.body.phone}' and update_date < (select update_date from profile where uid = '${req.body.uid}') and phone is not null)
+                                        where score = ${req.body.score} and update_date < convert(varchar, (select update_date from profile where uid = '${req.body.uid}'), 120)
                                     ) AS c
                                         `)
                                     .then(result => {
@@ -172,7 +172,7 @@ module.exports = {
     getRanking: (req, res, next) => {
         try {
             const uid = req.query.uid
-            knex.raw(`select '' as role, uid as name, score, right(phone, 4) as phone, ROW_NUMBER() OVER (ORDER BY score DESC, update_date ASC) AS rank from profile;`).then(async result => {
+            knex.raw(`select '' as role, right(uid,4) as name, score, right(phone, 4) as phone, ROW_NUMBER() OVER (ORDER BY score DESC, update_date ASC) AS rank from profile;`).then(async result => {
                 req.datas.ranking = result
                 next()
             })
